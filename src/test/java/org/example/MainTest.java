@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,21 +60,19 @@ public class MainTest {
     try (Connection connection = DriverManager.getConnection(config.url(), config.username(), config.password())) {
       DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
 
-      // Check if test_table exists and has correct columns
       Result<Record> columns = sqlContext.fetch(
           "SELECT column_name, data_type " +
               "FROM information_schema.columns " +
               "WHERE table_name = 'test_table'"
       );
 
-      // Verify 'id' (integer) and 'name' (varchar) columns
       boolean hasId = columns.stream().anyMatch(r ->
-          r.get("column_name").equals("id") &&
-              r.get("data_type").equals("integer")
+          Objects.equals(r.get("column_name"), "id") &&
+              Objects.equals(r.get("data_type"), "integer")
       );
       boolean hasName = columns.stream().anyMatch(r ->
-          r.get("column_name").equals("name") &&
-              r.get("data_type").equals("character varying")
+          Objects.equals(r.get("column_name"), "name") &&
+              Objects.equals(r.get("data_type"), "character varying")
       );
 
       assertAll(
