@@ -10,7 +10,8 @@ dependencies {
   implementation("org.jooq:jooq:3.20.2")
   implementation("org.jooq:jooq-meta:3.20.2")
   implementation("org.jooq:jooq-codegen:3.20.2")
-  runtimeOnly("org.postgresql:postgresql:42.7.5")
+  implementation("org.flywaydb:flyway-core:9.22.3")
+  testImplementation("org.postgresql:postgresql:42.7.5")
   testImplementation(platform("org.junit:junit-bom:5.10.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
 }
