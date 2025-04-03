@@ -5,6 +5,7 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.jooq.meta.clickhouse.information_schema.InformationSchema;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +13,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Objects;
 
+import static org.jooq.generated.tables.FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MainTest {
@@ -21,7 +23,7 @@ public class MainTest {
     var config = TestDatabaseConfig.load();
     try (Connection connection = DriverManager.getConnection(config.url(), config.username(), config.password())) {
       DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
-      Record record = sqlContext.fetchOne("SELECT 1 AS result");
+      Record record = sqlContext.select(DSL.val(1).as("result")).fetchOne();
       assertEquals(1, record.get("result"));
     }
   }
@@ -31,10 +33,8 @@ public class MainTest {
     var config = TestDatabaseConfig.load();
     try (Connection connection = DriverManager.getConnection(config.url(), config.username(), config.password())) {
       DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
-      Record record = sqlContext.fetchOne("SELECT NOW() AS current_time");
-      if (record != null) {
-        System.out.println("Current time: " + record.get("current_time"));
-      }
+      Record record = sqlContext.select(DSL.currentTimestamp().as("current_time")).fetchOne();
+      System.out.println("Current time: " + record.get("current_time"));
     }
   }
 
@@ -44,11 +44,14 @@ public class MainTest {
     try (Connection connection = DriverManager.getConnection(config.url(), config.username(), config.password())) {
       DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
 
-      Result<Record> columns = sqlContext.fetch(
-          "SELECT column_name, data_type " +
-              "FROM information_schema.columns " +
-              "WHERE table_name = 'test_table'"
-      );
+      var columns = sqlContext
+          .select(
+              DSL.field("column_name", String.class),
+              DSL.field("data_type", String.class)
+          )
+          .from(DSL.table("information_schema.columns"))
+          .where(DSL.field("table_name").eq("test_table"))
+          .fetch();
 
       boolean hasId = columns.stream().anyMatch(r ->
           Objects.equals(r.get("column_name"), "id") &&
@@ -73,11 +76,11 @@ public class MainTest {
       DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
 
       // Check if Flyway migration V1 is recorded
-      Record migrationRecord = sqlContext.fetchOne(
-          "SELECT version, success " +
-              "FROM flyway_schema_history " +
-              "WHERE version = '1'"
-      );
+      var migrationRecord = sqlContext
+          .select(FLYWAY_SCHEMA_HISTORY.VERSION, FLYWAY_SCHEMA_HISTORY.SUCCESS)
+          .from(FLYWAY_SCHEMA_HISTORY)
+          .where(FLYWAY_SCHEMA_HISTORY.VERSION.eq("1"))
+          .fetchOne();
 
       assertNotNull(migrationRecord, "V1 migration should exist in Flyway history");
       assertEquals("1", migrationRecord.get("version"));

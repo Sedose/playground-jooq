@@ -49,7 +49,7 @@ jooq {
 
   configurations {
     create("main") {
-      generateSchemaSourceOnCompilation.set(true)
+      generateSchemaSourceOnCompilation.set(false)
       jooqConfiguration.apply {
         jdbc.apply {
           driver = "org.postgresql.Driver"
@@ -64,14 +64,6 @@ jooq {
             inputSchema = "public"
             includes = ".*"
             excludes = ""
-          }
-          generate.apply {
-            isDeprecated = false
-            isRecords = true
-            isImmutablePojos = true
-          }
-          target.apply {
-            directory = "build/generated-sources/jooq"
           }
         }
       }
