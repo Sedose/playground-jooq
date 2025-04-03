@@ -1,6 +1,5 @@
 package org.example;
 
-import org.flywaydb.core.Flyway;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -16,21 +15,6 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MainTest {
-
-  @BeforeAll
-  static void setupDatabase() {
-    try {
-      Class.forName("org.postgresql.Driver");
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException("PostgreSQL driver missing", e);
-    }
-    var config = TestDatabaseConfig.load();
-    Flyway.configure()
-        .dataSource(config.url(), config.username(), config.password())
-        .driver("org.postgresql.Driver")
-        .load()
-        .migrate();
-  }
 
   @Test
   public void testSimpleSelectQuery() throws Exception {
