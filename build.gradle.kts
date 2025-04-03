@@ -44,6 +44,7 @@ flyway {
   user = getenv("DB_USER")
   password = getenv("DB_PASSWORD")
   driver = "org.postgresql.Driver"
+  locations = arrayOf("classpath:db/migration")
 }
 
 jooq {

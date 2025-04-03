@@ -36,8 +36,8 @@ public class V2__CreateEcommerceSchema extends BaseJavaMigration {
             "created_at",
             SQLDataType.TIMESTAMP
                 .nullable(false)
-                .defaultValue(DSL.field("NOW()", SQLDataType.TIMESTAMP))
-        ).constraints(DSL.constraint("pk_products").primaryKey("id"))
+                .defaultValue(DSL.field("NOW()", SQLDataType.TIMESTAMP)))
+        .constraints(DSL.constraint("pk_products").primaryKey("id"))
         .execute();
 
     dslContext

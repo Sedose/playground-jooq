@@ -7,17 +7,17 @@ import java.util.Properties;
 public class TestDatabaseConfig {
 
   public static DatabaseConnectionSettings load() {
-    try (InputStream input =
+    try (final InputStream input =
         TestDatabaseConfig.class.getClassLoader().getResourceAsStream("application.properties")) {
-      Properties properties = new Properties();
+      final Properties properties = new Properties();
       if (input == null) {
         throw new RuntimeException("Unable to find application.properties");
       }
       properties.load(input);
 
-      String url = properties.getProperty("jdbc.url");
-      String username = properties.getProperty("jdbc.username");
-      String password = properties.getProperty("jdbc.password");
+      final String url = properties.getProperty("jdbc.url");
+      final String username = properties.getProperty("jdbc.username");
+      final String password = properties.getProperty("jdbc.password");
 
       return new DatabaseConnectionSettings(url, username, password);
 
