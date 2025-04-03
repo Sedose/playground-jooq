@@ -7,7 +7,8 @@ import java.util.Properties;
 public class TestDatabaseConfig {
 
   public static DatabaseConnectionSettings load() {
-    try (InputStream input = TestDatabaseConfig.class.getClassLoader().getResourceAsStream("application.properties")) {
+    try (InputStream input =
+        TestDatabaseConfig.class.getClassLoader().getResourceAsStream("application.properties")) {
       Properties properties = new Properties();
       if (input == null) {
         throw new RuntimeException("Unable to find application.properties");

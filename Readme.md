@@ -47,6 +47,11 @@ jdbc.password=your_password
 ./gradlew tasks
 ```
 
+### 📜 This includes autoformatting
+```
+./gradlew spotlessApply
+```
+
 #### 💡 For commands starting from `./gradlew-env.sh` to work, create a `.env` file.
 #### Example:
 ```
@@ -54,4 +59,3 @@ export DB_URL=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app
 export DB_USER=your_username
 export DB_PASSWORD=your_password
 ```
-

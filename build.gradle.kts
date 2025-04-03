@@ -14,6 +14,8 @@ apply(plugin = "org.flywaydb.flyway")
 
 plugins {
   java
+  checkstyle
+  id("com.diffplug.spotless") version "7.0.2"
   id("org.flywaydb.flyway") version "11.4.0"
   id("nu.studer.jooq") version "10.0"
 }
@@ -69,4 +71,24 @@ jooq {
       }
     }
   }
+}
+
+spotless {
+  java {
+    googleJavaFormat("1.26.0")
+    target("src/**/*.java")
+    removeUnusedImports()
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+}
+
+checkstyle {
+  toolVersion = "10.22.0"
+  isShowViolations = true
+
+}
+
+tasks.withType<Checkstyle> {
+  exclude("**/generated/**")
 }
