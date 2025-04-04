@@ -1,22 +1,21 @@
 package org.example;
 
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
 import java.util.function.Consumer;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
 public class TestDatabaseConfig {
 
   public static void withDslContext(Consumer<DSLContext> testLogic) throws Exception {
     final var config = TestDatabaseConfig.load();
     try (final Connection connection =
-             DriverManager.getConnection(config.url(), config.username(), config.password())) {
+        DriverManager.getConnection(config.url(), config.username(), config.password())) {
       final DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
       testLogic.accept(sqlContext);
     }
