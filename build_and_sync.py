@@ -1,21 +1,17 @@
+import os
 import subprocess
 import sys
-import os
+
 
 def load_env_file(path=".env"):
     if not os.path.exists(path):
         print(f"⚠️  {path} file not found. Skipping .env load.")
         return
-
     with open(path) as file:
         for line in file:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            if line.startswith("export "):
-                line = line[len("export "):]
-            key, value = line.split("=", 1)
-            os.environ[key.strip()] = value.strip()
+            if "=" in line and not line.lstrip().startswith("#"):
+                key, value = map(str.strip, line.strip().split("=", 1))
+                os.environ[key] = value
 
 
 def run(command, step_name):
@@ -27,11 +23,12 @@ def run(command, step_name):
         print(f"❌ {step_name} — failed")
         sys.exit(1)
 
+
 def main():
     load_env_file()
     steps = [
-#         (["./gradlew", "clean"], "Clean"),
-#         (["./gradlew", "flywayClean", "-Dflyway.cleanDisabled=false"], "Clean"),
+        #         (["./gradlew", "clean"], "Clean"),
+        #         (["./gradlew", "flywayClean", "-Dflyway.cleanDisabled=false"], "Clean"),
         (["./gradlew", "spotlessApply"], "Spotless apply"),
         (["./gradlew", "assemble"], "Gradle build"),
         (["./gradlew", "flywayMigrate"], "Flyway migrate"),
@@ -39,6 +36,7 @@ def main():
     ]
     for command, step_name in steps:
         run(command, step_name)
+
 
 if __name__ == "__main__":
     main()

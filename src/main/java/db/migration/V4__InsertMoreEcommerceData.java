@@ -12,7 +12,7 @@ import org.jooq.impl.DSL;
 public class V4__InsertMoreEcommerceData extends BaseJavaMigration {
 
   @Override
-  public void migrate(Context context) throws Exception {
+  public void migrate(Context context) {
     final DSLContext dslContext = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
 
     final List<String> extraCategories = List.of("Computers", "Games");

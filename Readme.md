@@ -25,7 +25,7 @@ python3 build_and_sync.py
 #### 💡 Create a `.env` file with the correct DB credentials.
 #### Example:
 ```
-export DB_URL=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/db_name
-export DB_USER=db_username
-export DB_PASSWORD=db_password
+DB_URL=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/db_name
+DB_USER=db_username
+DB_PASSWORD=db_password
 ```
