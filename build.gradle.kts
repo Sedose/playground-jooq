@@ -76,7 +76,7 @@ jooq {
 
 spotless {
   java {
-    googleJavaFormat("1.26.0")
+    eclipse()
     target("src/**/*.java")
     removeUnusedImports()
     trimTrailingWhitespace()
