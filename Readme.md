@@ -6,56 +6,26 @@
   Example content:
 
 ```properties
-jdbc.url=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/koyebdb
-jdbc.username=your_username
-jdbc.password=your_password
+jdbc.url=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/db_name
+jdbc.username=db_username
+jdbc.password=db_password
 ```
 
 - Execute the test suite to verify DB connectivity and see JOOQ in action.
 - Review the test cases to understand how JOOQ interacts with the DB.
 - Feel free to modify queries, add assertions, and experiment
 
-## Useful Gradle Commands
+## Useful Commands
 
-### ✅ Run all tests
+### ✅ Automation script
 ```
-./gradlew-env.sh test
-```
-
-### 🗄 Apply Flyway DB migrations
-```
-./gradlew-env.sh flywayMigrate
+python3 build_and_sync.py 
 ```
 
-### 🧬 Generate jOOQ classes from current DB schema
-```
-./gradlew-env.sh generateJooq  
-```
-
-### 🔍 See Flyway migration status
-```
-./gradlew-env.sh flywayInfo
-```
-
-### 🧹 Clean generated sources and build
-```
-./gradlew clean
-```
-
-### 📜 Show all available Gradle tasks
-```
-./gradlew tasks
-```
-
-### 📜 This includes autoformatting
-```
-./gradlew spotlessApply
-```
-
-#### 💡 For commands starting from `./gradlew-env.sh` to work, create a `.env` file.
+#### 💡 Create a `.env` file with the correct DB credentials.
 #### Example:
 ```
-export DB_URL=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/koyebdb
-export DB_USER=your_username
-export DB_PASSWORD=your_password
+export DB_URL=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/db_name
+export DB_USER=db_username
+export DB_PASSWORD=db_password
 ```
