@@ -18,25 +18,30 @@ public class V4__InsertMoreEcommerceData extends BaseJavaMigration {
 
 		final List<String> extraCategories = List.of("Computers", "Games");
 		extraCategories.forEach(category -> dslContext.insertInto(DSL.table("categories"), DSL.field("name"))
-				.values(category).execute());
+				.values(category)
+				.execute());
 
 		final Record insertedCustomer1 = dslContext
 				.insertInto(DSL.table("customers"), DSL.field("email"), DSL.field("full_name"))
-				.values("alice@example.com", "Alice Wonderland").returning(DSL.field("id")).fetchOne();
+				.values("alice@example.com", "Alice Wonderland").returning(DSL.field("id"))
+				.fetchOne();
 
 		final Record insertedCustomer2 = dslContext
 				.insertInto(DSL.table("customers"), DSL.field("email"), DSL.field("full_name"))
-				.values("bob@example.com", "Bob Builder").returning(DSL.field("id")).fetchOne();
+				.values("bob@example.com", "Bob Builder").returning(DSL.field("id"))
+				.fetchOne();
 
 		final Record laptopProduct = dslContext
 				.insertInto(DSL.table("products"), DSL.field("name"), DSL.field("description"), DSL.field("price"))
 				.values("Laptop 2025", "Powerful laptop for everyday tasks", BigDecimal.valueOf(999.99))
-				.returning(DSL.field("id"), DSL.field("price")).fetchOne();
+				.returning(DSL.field("id"), DSL.field("price"))
+				.fetchOne();
 
 		final Record gamingConsoleProduct = dslContext
 				.insertInto(DSL.table("products"), DSL.field("name"), DSL.field("description"), DSL.field("price"))
 				.values("Game Console X", "Next generation gaming console", BigDecimal.valueOf(299.99))
-				.returning(DSL.field("id"), DSL.field("price")).fetchOne();
+				.returning(DSL.field("id"), DSL.field("price"))
+				.fetchOne();
 
 		final Record computersCategoryRecord = dslContext.select(DSL.field("id")).from(DSL.table("categories"))
 				.where(DSL.field("name").eq("Computers")).fetchOne();
@@ -50,19 +55,22 @@ public class V4__InsertMoreEcommerceData extends BaseJavaMigration {
 
 		if (laptopProduct != null && computersCategoryId != null) {
 			dslContext.insertInto(DSL.table("product_categories"), DSL.field("product_id"), DSL.field("category_id"))
-					.values(laptopProduct.get("id", Long.class), computersCategoryId).execute();
+					.values(laptopProduct.get("id", Long.class), computersCategoryId)
+					.execute();
 		}
 
 		if (gamingConsoleProduct != null && gamesCategoryId != null) {
 			dslContext.insertInto(DSL.table("product_categories"), DSL.field("product_id"), DSL.field("category_id"))
-					.values(gamingConsoleProduct.get("id", Long.class), gamesCategoryId).execute();
+					.values(gamingConsoleProduct.get("id", Long.class), gamesCategoryId)
+					.execute();
 		}
 
 		if (insertedCustomer1 != null && laptopProduct != null) {
 			final Record createdOrder = dslContext
 					.insertInto(DSL.table("orders"), DSL.field("customer_id"), DSL.field("total_amount"))
 					.values(insertedCustomer1.get("id", Long.class), BigDecimal.valueOf(1299.98))
-					.returning(DSL.field("id")).fetchOne();
+					.returning(DSL.field("id"))
+					.fetchOne();
 
 			if (createdOrder != null) {
 				dslContext
@@ -79,7 +87,8 @@ public class V4__InsertMoreEcommerceData extends BaseJavaMigration {
 					.insertInto(DSL.table("orders"), DSL.field("customer_id"), DSL.field("total_amount"))
 					.values(insertedCustomer2.get("id", Long.class),
 							gamingConsoleProduct.get("price", BigDecimal.class))
-					.returning(DSL.field("id")).fetchOne();
+					.returning(DSL.field("id"))
+					.fetchOne();
 
 			if (anotherOrder != null) {
 				dslContext
