@@ -1,4 +1,4 @@
-# Java + Gradle + JOOQ + Flyway
+# Java + Gradle + JOOQ + Flyway + Spotless + Checkstyle
 ## Getting started
 - Create a free PostgreSQL instance. \
   👉 https://app.koyeb.com/

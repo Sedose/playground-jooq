@@ -87,7 +87,6 @@ spotless {
 checkstyle {
   toolVersion = "10.22.0"
   isShowViolations = true
-
 }
 
 tasks.withType<Checkstyle> {
