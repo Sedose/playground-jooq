@@ -30,8 +30,10 @@ def run(command, step_name):
 def main():
     load_env_file()
     steps = [
+#         (["./gradlew", "clean"], "Clean"),
+#         (["./gradlew", "flywayClean", "-Dflyway.cleanDisabled=false"], "Clean"),
         (["./gradlew", "spotlessApply"], "Spotless apply"),
-        (["./gradlew", "build"], "Gradle build"),
+        (["./gradlew", "assemble"], "Gradle build"),
         (["./gradlew", "flywayMigrate"], "Flyway migrate"),
         (["./gradlew", "generateJooq"], "jOOQ code generation"),
     ]

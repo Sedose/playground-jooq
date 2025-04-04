@@ -4,8 +4,6 @@
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-
-    <!-- LineLength должен быть ПРЯМОЙ дочкой Checker -->
     <module name="LineLength">
         <property name="max" value="120"/>
     </module>
