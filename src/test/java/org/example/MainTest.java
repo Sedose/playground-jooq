@@ -220,17 +220,20 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(CUSTOMERS.FULL_NAME, DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
+              dsl.select(CUSTOMERS.ID,CUSTOMERS.FULL_NAME, DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
                   .from(ORDERS)
                   .join(CUSTOMERS)
                   .on(ORDERS.CUSTOMER_ID.eq(CUSTOMERS.ID))
-                  .groupBy(CUSTOMERS.FULL_NAME)
+                  .groupBy(CUSTOMERS.ID, CUSTOMERS.FULL_NAME)
                   .orderBy(DSL.sum(ORDERS.TOTAL_AMOUNT).desc())
-                  .limit(3)
+                  .limit(2)
                   .fetch();
 
           assertEquals(2, results.size());
-          results.forEach(record -> assertNotNull(record.get(CUSTOMERS.FULL_NAME)));
+          results.forEach(record -> {
+            assertNotNull(record.get(CUSTOMERS.FULL_NAME));
+            assertNotNull(record.get("total_spent"));
+          });
         });
   }
 }
