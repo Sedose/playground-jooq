@@ -170,4 +170,67 @@ public class MainTest {
               });
         });
   }
+
+  @Test
+  void testTotalOrderAmountPerCustomer() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var results =
+              dsl.select(CUSTOMERS.FULL_NAME, DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
+                  .from(CUSTOMERS)
+                  .join(ORDERS)
+                  .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
+                  .groupBy(CUSTOMERS.FULL_NAME)
+                  .fetch();
+
+          assertFalse(results.isEmpty());
+          results.forEach(
+              record -> {
+                assertNotNull(record.get(CUSTOMERS.FULL_NAME));
+                assertNotNull(record.get("total_spent"));
+              });
+        });
+  }
+
+  @Test
+  void testProductCountPerCategory() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var results =
+              dsl.select(CATEGORIES.NAME, DSL.count(PRODUCTS.ID).as("product_count"))
+                  .from(CATEGORIES)
+                  .join(PRODUCT_CATEGORIES)
+                  .on(CATEGORIES.ID.eq(PRODUCT_CATEGORIES.CATEGORY_ID))
+                  .join(PRODUCTS)
+                  .on(PRODUCT_CATEGORIES.PRODUCT_ID.eq(PRODUCTS.ID))
+                  .groupBy(CATEGORIES.NAME)
+                  .fetch();
+
+          assertFalse(results.isEmpty());
+          results.forEach(
+              record -> {
+                assertNotNull(record.get(CATEGORIES.NAME));
+                assertTrue(((Integer) record.get("product_count")) > 0);
+              });
+        });
+  }
+
+  @Test
+  void testTopCustomersBySpend() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var results =
+              dsl.select(CUSTOMERS.FULL_NAME, DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
+                  .from(ORDERS)
+                  .join(CUSTOMERS)
+                  .on(ORDERS.CUSTOMER_ID.eq(CUSTOMERS.ID))
+                  .groupBy(CUSTOMERS.FULL_NAME)
+                  .orderBy(DSL.sum(ORDERS.TOTAL_AMOUNT).desc())
+                  .limit(3)
+                  .fetch();
+
+          assertEquals(2, results.size());
+          results.forEach(record -> assertNotNull(record.get(CUSTOMERS.FULL_NAME)));
+        });
+  }
 }

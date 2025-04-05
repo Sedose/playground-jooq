@@ -14,7 +14,7 @@ def load_env_file(path=".env"):
                 os.environ[key] = value
 
 
-def run(command, step_name):
+def run_command(command, step_name):
     print(f"\n🟡 {step_name}...")
     try:
         subprocess.run(command, check=True, env=os.environ)
@@ -36,7 +36,7 @@ def main():
         (["./gradlew", "test"], "Running tests"),
     ]
     for command, step_name in steps:
-        run(command, step_name)
+        run_command(command, step_name)
 
 
 if __name__ == "__main__":
