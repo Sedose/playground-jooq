@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import org.example.dto.CustomerWithOrdersDto;
+import org.example.dto.OrderDto;
 import org.jooq.Record;
 import org.jooq.generated.tables.records.CategoriesRecord;
 import org.jooq.impl.DSL;
@@ -296,6 +298,52 @@ public class MainTest {
 
                 assertNotNull(id);
                 assertNotNull(name);
+              });
+        });
+  }
+
+  // This test demonstrates how to use the multiset feature in jOOQ to fetch a list of orders for
+  // each customer. Mapping to custom DTO is done
+  @Test
+  void testFetchCustomersWithOrdersMultiset() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var results =
+              dsl.select(
+                      CUSTOMERS.ID,
+                      CUSTOMERS.FULL_NAME,
+                      DSL.multiset(
+                              DSL.select(ORDERS.ID, ORDERS.ORDER_DATE, ORDERS.TOTAL_AMOUNT)
+                                  .from(ORDERS)
+                                  .where(ORDERS.CUSTOMER_ID.eq(CUSTOMERS.ID)))
+                          .convertFrom(
+                              orderRecords ->
+                                  orderRecords.map(
+                                      r ->
+                                          new OrderDto(
+                                              r.get(ORDERS.ID),
+                                              r.get(ORDERS.ORDER_DATE),
+                                              r.get(ORDERS.TOTAL_AMOUNT))))
+                          .as("orders"))
+                  .from(CUSTOMERS)
+                  .fetch()
+                  .map(
+                      record ->
+                          new CustomerWithOrdersDto(
+                              record.get(CUSTOMERS.ID),
+                              record.get(CUSTOMERS.FULL_NAME),
+                              record.get("orders", List.class) // returns List<OrderDto>
+                              ));
+
+          assertFalse(results.isEmpty());
+          results.forEach(
+              customer -> {
+                assertNotNull(customer.id());
+                assertNotNull(customer.fullName());
+                assertNotNull(customer.orders());
+
+                // Optional: print or assert something about orders
+                System.out.println(customer.fullName() + " → orders: " + customer.orders().size());
               });
         });
   }
