@@ -76,7 +76,7 @@ jooq {
 
 spotless {
   java {
-    eclipse().configFile("config/spotless/eclipse-java-formatter.xml")
+    googleJavaFormat()
     target("src/**/*.java")
     removeUnusedImports()
     trimTrailingWhitespace()
