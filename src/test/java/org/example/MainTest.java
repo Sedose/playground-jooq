@@ -261,4 +261,42 @@ public class MainTest {
           results.forEach(record -> assertNotNull(record.get(CUSTOMERS.FULL_NAME)));
         });
   }
+
+  // Just to show how to use CTEs
+  @Test
+  void testCustomersWithoutOrdersWithId() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var noOrdersCTE =
+              DSL.name("NoOrders")
+                  .fields("id", "full_name")
+                  .as(
+                      DSL.select(CUSTOMERS.ID, CUSTOMERS.FULL_NAME)
+                          .from(CUSTOMERS)
+                          .leftJoin(ORDERS)
+                          .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
+                          .where(ORDERS.ID.isNull()));
+
+          final var result =
+              dsl.with(noOrdersCTE)
+                  .select(
+                      DSL.field(DSL.name("NoOrders", "id"), Long.class),
+                      DSL.field(DSL.name("NoOrders", "full_name"), String.class))
+                  .from(DSL.table(DSL.name("NoOrders")))
+                  .fetch();
+
+          assertFalse(result.isEmpty(), "Expected customers without orders");
+
+          result.forEach(
+              record -> {
+                final Long id = record.get("id", Long.class);
+                final String name = record.get("full_name", String.class);
+
+                System.out.println("Customer without orders: [" + id + "] " + name);
+
+                assertNotNull(id);
+                assertNotNull(name);
+              });
+        });
+  }
 }
