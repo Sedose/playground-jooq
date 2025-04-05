@@ -220,7 +220,10 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(CUSTOMERS.ID,CUSTOMERS.FULL_NAME, DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
+              dsl.select(
+                      CUSTOMERS.ID,
+                      CUSTOMERS.FULL_NAME,
+                      DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
                   .from(ORDERS)
                   .join(CUSTOMERS)
                   .on(ORDERS.CUSTOMER_ID.eq(CUSTOMERS.ID))
@@ -230,10 +233,32 @@ public class MainTest {
                   .fetch();
 
           assertEquals(2, results.size());
-          results.forEach(record -> {
-            assertNotNull(record.get(CUSTOMERS.FULL_NAME));
-            assertNotNull(record.get("total_spent"));
-          });
+          results.forEach(
+              record -> {
+                assertNotNull(record.get(CUSTOMERS.FULL_NAME));
+                assertNotNull(record.get("total_spent"));
+              });
+        });
+  }
+
+  @Test
+  void testCustomersLeftJoinOrders() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var results =
+              dsl.select(
+                      CUSTOMERS.FULL_NAME,
+                      ORDERS.ID.as("order_id"),
+                      ORDERS.ORDER_DATE,
+                      ORDERS.TOTAL_AMOUNT)
+                  .from(CUSTOMERS)
+                  .leftJoin(ORDERS)
+                  .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
+                  .fetch();
+
+          assertFalse(results.isEmpty());
+
+          results.forEach(record -> assertNotNull(record.get(CUSTOMERS.FULL_NAME)));
         });
   }
 }
