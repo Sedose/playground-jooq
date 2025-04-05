@@ -33,6 +33,7 @@ def main():
         (["./gradlew", "assemble"], "Gradle build"),
         (["./gradlew", "flywayMigrate"], "Flyway migrate"),
         (["./gradlew", "generateJooq"], "jOOQ code generation"),
+        (["./gradlew", "test"], "Running tests"),
     ]
     for command, step_name in steps:
         run(command, step_name)

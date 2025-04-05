@@ -6,13 +6,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
 import java.util.function.Consumer;
+import lombok.SneakyThrows;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
 public class TestDatabaseConfig {
 
-  public static void withDslContext(Consumer<DSLContext> testLogic) throws Exception {
+  @SneakyThrows
+  public static void withDslContext(Consumer<DSLContext> testLogic) {
     final var config = TestDatabaseConfig.load();
     try (final Connection connection =
         DriverManager.getConnection(config.url(), config.username(), config.password())) {

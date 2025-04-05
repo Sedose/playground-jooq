@@ -31,6 +31,10 @@ dependencies {
   implementation("org.jooq:jooq-meta:3.20.2")
   implementation("org.jooq:jooq-codegen:3.20.2")
   implementation("org.postgresql:postgresql:42.7.5")
+  compileOnly("org.projectlombok:lombok:1.18.38")
+  annotationProcessor("org.projectlombok:lombok:1.18.38")
+  testCompileOnly("org.projectlombok:lombok:1.18.38")
+  testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
   testImplementation(platform("org.junit:junit-bom:5.10.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
 }
