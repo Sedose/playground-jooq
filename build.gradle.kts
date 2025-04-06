@@ -25,6 +25,8 @@ repositories {
 }
 
 dependencies {
+  implementation ("org.slf4j:slf4j-api:2.0.17")
+  implementation ("ch.qos.logback:logback-classic:1.5.18")
   jooqGenerator("org.postgresql:postgresql:42.7.5")
   implementation("org.flywaydb:flyway-database-postgresql:11.4.0")
   implementation("org.jooq:jooq:3.20.2")

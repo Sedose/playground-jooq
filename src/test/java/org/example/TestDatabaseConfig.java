@@ -9,16 +9,18 @@ import java.util.function.Consumer;
 import lombok.SneakyThrows;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
 public class TestDatabaseConfig {
 
   @SneakyThrows
   public static void withDslContext(Consumer<DSLContext> testLogic) {
-    final var config = TestDatabaseConfig.load();
+    final var config = load();
     try (final Connection connection =
         DriverManager.getConnection(config.url(), config.username(), config.password())) {
-      final DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES);
+      final Settings settings = new Settings().withExecuteLogging(true);
+      final DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES, settings);
       testLogic.accept(sqlContext);
     }
   }

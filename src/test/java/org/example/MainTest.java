@@ -25,8 +25,8 @@ public class MainTest {
   @Test
   void testSimpleSelectQuery() {
     TestDatabaseConfig.withDslContext(
-        sqlContext -> {
-          final Record record = sqlContext.select(DSL.val(1).as("result")).fetchOne();
+        dslContext -> {
+          final Record record = dslContext.select(DSL.val(1).as("result")).fetchOne();
           assertEquals(1, record.get("result"));
         });
   }
@@ -34,9 +34,9 @@ public class MainTest {
   @Test
   void testCurrentTimestampQuery() {
     TestDatabaseConfig.withDslContext(
-        sqlContext -> {
+        dslContext -> {
           final Record record =
-              sqlContext.select(DSL.currentTimestamp().as("current_time")).fetchOne();
+              dslContext.select(DSL.currentTimestamp().as("current_time")).fetchOne();
           System.out.println("Current time: " + record.get("current_time"));
         });
   }
@@ -264,27 +264,16 @@ public class MainTest {
         });
   }
 
-  // Just to show how to use CTEs
   @Test
   void testCustomersWithoutOrdersWithId() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var noOrdersCTE =
-              DSL.name("NoOrders")
-                  .fields("id", "full_name")
-                  .as(
-                      DSL.select(CUSTOMERS.ID, CUSTOMERS.FULL_NAME)
-                          .from(CUSTOMERS)
-                          .leftJoin(ORDERS)
-                          .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
-                          .where(ORDERS.ID.isNull()));
-
           final var result =
-              dsl.with(noOrdersCTE)
-                  .select(
-                      DSL.field(DSL.name("NoOrders", "id"), Long.class),
-                      DSL.field(DSL.name("NoOrders", "full_name"), String.class))
-                  .from(DSL.table(DSL.name("NoOrders")))
+              dsl.select(CUSTOMERS.ID, CUSTOMERS.FULL_NAME)
+                  .from(CUSTOMERS)
+                  .leftJoin(ORDERS)
+                  .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
+                  .where(ORDERS.ID.isNull())
                   .fetch();
 
           assertFalse(result.isEmpty(), "Expected customers without orders");
