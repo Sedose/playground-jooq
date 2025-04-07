@@ -77,72 +77,60 @@ public class V4__InsertMoreEcommerceData extends BaseJavaMigration {
     final Long gamesCategoryId =
         gamesCategoryRecord != null ? gamesCategoryRecord.get("id", Long.class) : null;
 
-    if (laptopProduct != null && computersCategoryId != null) {
-      dslContext
-          .insertInto(
-              DSL.table("product_categories"), DSL.field("product_id"), DSL.field("category_id"))
-          .values(laptopProduct.get("id", Long.class), computersCategoryId)
-          .execute();
-    }
+    dslContext
+        .insertInto(
+            DSL.table("product_categories"), DSL.field("product_id"), DSL.field("category_id"))
+        .values(laptopProduct.get("id", Long.class), computersCategoryId)
+        .execute();
 
-    if (gamingConsoleProduct != null && gamesCategoryId != null) {
-      dslContext
-          .insertInto(
-              DSL.table("product_categories"), DSL.field("product_id"), DSL.field("category_id"))
-          .values(gamingConsoleProduct.get("id", Long.class), gamesCategoryId)
-          .execute();
-    }
+    dslContext
+        .insertInto(
+            DSL.table("product_categories"), DSL.field("product_id"), DSL.field("category_id"))
+        .values(gamingConsoleProduct.get("id", Long.class), gamesCategoryId)
+        .execute();
 
-    if (insertedCustomer1 != null && laptopProduct != null) {
-      final Record createdOrder =
-          dslContext
-              .insertInto(DSL.table("orders"), DSL.field("customer_id"), DSL.field("total_amount"))
-              .values(insertedCustomer1.get("id", Long.class), BigDecimal.valueOf(1299.98))
-              .returning(DSL.field("id"))
-              .fetchOne();
-
-      if (createdOrder != null) {
+    final Record createdOrder =
         dslContext
-            .insertInto(
-                DSL.table("order_items"),
-                DSL.field("order_id"),
-                DSL.field("product_id"),
-                DSL.field("quantity"),
-                DSL.field("unit_price"))
-            .values(
-                createdOrder.get("id", Long.class),
-                laptopProduct.get("id", Long.class),
-                1,
-                laptopProduct.get("price", BigDecimal.class))
-            .execute();
-      }
-    }
+            .insertInto(DSL.table("orders"), DSL.field("customer_id"), DSL.field("total_amount"))
+            .values(insertedCustomer1.get("id", Long.class), BigDecimal.valueOf(1299.98))
+            .returning(DSL.field("id"))
+            .fetchOne();
 
-    if (insertedCustomer2 != null && gamingConsoleProduct != null) {
-      final Record anotherOrder =
-          dslContext
-              .insertInto(DSL.table("orders"), DSL.field("customer_id"), DSL.field("total_amount"))
-              .values(
-                  insertedCustomer2.get("id", Long.class),
-                  gamingConsoleProduct.get("price", BigDecimal.class))
-              .returning(DSL.field("id"))
-              .fetchOne();
+    dslContext
+        .insertInto(
+            DSL.table("order_items"),
+            DSL.field("order_id"),
+            DSL.field("product_id"),
+            DSL.field("quantity"),
+            DSL.field("unit_price"))
+        .values(
+            createdOrder.get("id", Long.class),
+            laptopProduct.get("id", Long.class),
+            1,
+            laptopProduct.get("price", BigDecimal.class))
+        .execute();
 
-      if (anotherOrder != null) {
+    final Record anotherOrder =
         dslContext
-            .insertInto(
-                DSL.table("order_items"),
-                DSL.field("order_id"),
-                DSL.field("product_id"),
-                DSL.field("quantity"),
-                DSL.field("unit_price"))
+            .insertInto(DSL.table("orders"), DSL.field("customer_id"), DSL.field("total_amount"))
             .values(
-                anotherOrder.get("id", Long.class),
-                gamingConsoleProduct.get("id", Long.class),
-                1,
+                insertedCustomer2.get("id", Long.class),
                 gamingConsoleProduct.get("price", BigDecimal.class))
-            .execute();
-      }
-    }
+            .returning(DSL.field("id"))
+            .fetchOne();
+
+    dslContext
+        .insertInto(
+            DSL.table("order_items"),
+            DSL.field("order_id"),
+            DSL.field("product_id"),
+            DSL.field("quantity"),
+            DSL.field("unit_price"))
+        .values(
+            anotherOrder.get("id", Long.class),
+            gamingConsoleProduct.get("id", Long.class),
+            1,
+            gamingConsoleProduct.get("price", BigDecimal.class))
+        .execute();
   }
 }

@@ -13,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.example.dto.CustomerWithOrdersDto;
-import org.example.dto.OrderDto;
 import org.jooq.Record;
 import org.jooq.generated.tables.records.CategoriesRecord;
 import org.jooq.impl.DSL;
@@ -287,6 +285,42 @@ public class MainTest {
 
                 assertNotNull(id);
                 assertNotNull(name);
+              });
+        });
+  }
+
+  @Test
+  void testLeetcodePersonAddressJoin() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var firstName = DSL.field(DSL.name("firstName"));
+          final var lastName = DSL.field(DSL.name("lastName"));
+          final var city = DSL.field(DSL.name("city"));
+          final var state = DSL.field(DSL.name("state"));
+          final var personId = DSL.field(DSL.name("personId"));
+
+          final var personTable = DSL.table(DSL.name("leetcode", "Person"));
+          final var addressTable = DSL.table(DSL.name("leetcode", "Address"));
+
+          final var results =
+              dsl.select(firstName, lastName, city, state)
+                  .from(personTable)
+                  .leftJoin(addressTable)
+                  .using(personId)
+                  .fetch();
+
+          assertFalse(results.isEmpty(), "Result should not be empty");
+
+          results.forEach(
+              record -> {
+                assertNotNull(record.get(firstName));
+                assertNotNull(record.get(lastName));
+                System.out.printf(
+                    "%s %s | city: %s | state: %s%n",
+                    record.get(firstName),
+                    record.get(lastName),
+                    record.get(city),
+                    record.get(state));
               });
         });
   }
