@@ -11,8 +11,8 @@ public class V6__InsertLeetcodeData extends BaseJavaMigration {
   public void migrate(Context context) {
     final DSLContext dsl = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
 
-    final var personTable = DSL.name("leetcode", "Person");
-    final var addressTable = DSL.name("leetcode", "Address");
+    final var personTable = DSL.name("Person");
+    final var addressTable = DSL.name("Address");
 
     dsl.insertInto(DSL.table(personTable))
         .columns(

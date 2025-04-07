@@ -1,10 +1,12 @@
 package org.example;
 
+import static org.jooq.generated.Tables.ADDRESS;
 import static org.jooq.generated.Tables.CATEGORIES;
 import static org.jooq.generated.Tables.CUSTOMERS;
 import static org.jooq.generated.Tables.FLYWAY_SCHEMA_HISTORY;
 import static org.jooq.generated.Tables.ORDERS;
 import static org.jooq.generated.Tables.ORDER_ITEMS;
+import static org.jooq.generated.Tables.PERSON;
 import static org.jooq.generated.Tables.PRODUCTS;
 import static org.jooq.generated.Tables.PRODUCT_CATEGORIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -289,39 +291,30 @@ public class MainTest {
         });
   }
 
-  @Test
-  void testLeetcodePersonAddressJoin() {
-    TestDatabaseConfig.withDslContext(
-        dsl -> {
-          final var firstName = DSL.field(DSL.name("firstName"));
-          final var lastName = DSL.field(DSL.name("lastName"));
-          final var city = DSL.field(DSL.name("city"));
-          final var state = DSL.field(DSL.name("state"));
-          final var personId = DSL.field(DSL.name("personId"));
+    @Test
+    void testLeetcodePersonAddressJoin() {
+      TestDatabaseConfig.withDslContext(
+          dsl -> {
+            final var results =
+                dsl.select(PERSON.FIRSTNAME, PERSON.LASTNAME, ADDRESS.CITY, ADDRESS.STATE)
+                    .from(PERSON)
+                    .leftJoin(ADDRESS)
+                    .using(PERSON.PERSONID)
+                    .fetch();
 
-          final var personTable = DSL.table(DSL.name("leetcode", "Person"));
-          final var addressTable = DSL.table(DSL.name("leetcode", "Address"));
+            assertFalse(results.isEmpty());
 
-          final var results =
-              dsl.select(firstName, lastName, city, state)
-                  .from(personTable)
-                  .leftJoin(addressTable)
-                  .using(personId)
-                  .fetch();
-
-          assertFalse(results.isEmpty(), "Result should not be empty");
-
-          results.forEach(
-              record -> {
-                assertNotNull(record.get(firstName));
-                assertNotNull(record.get(lastName));
-                System.out.printf(
-                    "%s %s | city: %s | state: %s%n",
-                    record.get(firstName),
-                    record.get(lastName),
-                    record.get(city),
-                    record.get(state));
-              });
-        });
-  }
+            results.forEach(
+                record -> {
+                  assertNotNull(record.get(PERSON.FIRSTNAME));
+                  assertNotNull(record.get(PERSON.LASTNAME));
+                  System.out.printf(
+                      "%s %s | city: %s | state: %s%n",
+                      record.get(PERSON.FIRSTNAME),
+                      record.get(PERSON.LASTNAME),
+                      record.get(ADDRESS.CITY),
+                      record.get(ADDRESS.STATE));
+                });
+          });
+    }
 }

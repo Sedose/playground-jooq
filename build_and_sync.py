@@ -27,8 +27,8 @@ def run_command(command, step_name):
 def main():
     load_env_file()
     steps = [
-        #         (["./gradlew", "clean"], "Clean"),
-        #         (["./gradlew", "flywayClean", "-Dflyway.cleanDisabled=false"], "Clean"),
+        # (["./gradlew", "clean"], "Clean"),
+        # (["./gradlew", "flywayClean", "-Dflyway.cleanDisabled=false"], "Clean"),
         (["./gradlew", "spotlessApply"], "Spotless apply"),
         (["./gradlew", "assemble"], "Gradle build"),
         (["./gradlew", "flywayMigrate"], "Flyway migrate"),
