@@ -6,17 +6,12 @@
         </encoder>
     </appender>
 
-    <!-- Log jOOQ SQL execution at DEBUG level -->
-    <logger name="org.jooq.tools.LoggerListener" level="DEBUG">
-        <appender-ref ref="CONSOLE" />
-    </logger>
+    <!-- Let JOOQ log at DEBUG but don't re-attach the appender -->
+    <logger name="org.jooq.tools.LoggerListener" level="DEBUG"/>
+    <logger name="org.jooq" level="DEBUG"/>
 
-    <!-- Optional: all jOOQ internal logs -->
-    <logger name="org.jooq" level="DEBUG">
-        <appender-ref ref="CONSOLE" />
-    </logger>
-
+    <!-- Root logger handles all appending -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

@@ -21,6 +21,7 @@ public class V6__InsertLeetcodeData extends BaseJavaMigration {
             DSL.field(DSL.name("firstName")))
         .values(1, "Wang", "Allen")
         .values(2, "Alice", "Bob")
+        .values(3, "Without", "Orders")
         .execute();
 
     dsl.insertInto(DSL.table(addressTable))

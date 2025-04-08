@@ -3,6 +3,7 @@ package org.example;
 import static org.jooq.generated.Tables.ADDRESS;
 import static org.jooq.generated.Tables.CATEGORIES;
 import static org.jooq.generated.Tables.CUSTOMERS;
+import static org.jooq.generated.Tables.EMPLOYEE;
 import static org.jooq.generated.Tables.FLYWAY_SCHEMA_HISTORY;
 import static org.jooq.generated.Tables.ORDERS;
 import static org.jooq.generated.Tables.ORDER_ITEMS;
@@ -280,41 +281,54 @@ public class MainTest {
 
           result.forEach(
               record -> {
-                final Long id = record.get("id", Long.class);
-                final String name = record.get("full_name", String.class);
-
-                System.out.println("Customer without orders: [" + id + "] " + name);
-
-                assertNotNull(id);
-                assertNotNull(name);
+                assertNotNull(record.get("id", Long.class));
+                assertNotNull(record.get("full_name", String.class));
               });
         });
   }
 
-    @Test
-    void testLeetcodePersonAddressJoin() {
-      TestDatabaseConfig.withDslContext(
-          dsl -> {
-            final var results =
-                dsl.select(PERSON.FIRSTNAME, PERSON.LASTNAME, ADDRESS.CITY, ADDRESS.STATE)
-                    .from(PERSON)
-                    .leftJoin(ADDRESS)
-                    .using(PERSON.PERSONID)
-                    .fetch();
+  @Test
+  void testLeetcodePersonAddressJoin() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var results =
+              dsl.select(PERSON.FIRSTNAME, PERSON.LASTNAME, ADDRESS.CITY, ADDRESS.STATE)
+                  .from(PERSON)
+                  .leftJoin(ADDRESS)
+                  .using(PERSON.PERSONID)
+                  .fetch();
 
-            assertFalse(results.isEmpty());
+          assertFalse(results.isEmpty());
 
-            results.forEach(
-                record -> {
-                  assertNotNull(record.get(PERSON.FIRSTNAME));
-                  assertNotNull(record.get(PERSON.LASTNAME));
-                  System.out.printf(
-                      "%s %s | city: %s | state: %s%n",
-                      record.get(PERSON.FIRSTNAME),
-                      record.get(PERSON.LASTNAME),
-                      record.get(ADDRESS.CITY),
-                      record.get(ADDRESS.STATE));
-                });
-          });
-    }
+          results.forEach(
+              record -> {
+                assertNotNull(record.get(PERSON.FIRSTNAME));
+                assertNotNull(record.get(PERSON.LASTNAME));
+              });
+        });
+  }
+
+  @Test
+  void testSubordinatesWhoEarnMoreThanTheirManagers() {
+    TestDatabaseConfig.withDslContext(
+        dsl -> {
+          final var subordinate = EMPLOYEE.as("subordinate");
+          final var manager = EMPLOYEE.as("manager");
+
+          final var results =
+              dsl.select(subordinate.NAME.as("Subordinate"))
+                  .from(subordinate)
+                  .join(manager)
+                  .on(subordinate.MANAGERID.eq(manager.ID))
+                  .where(subordinate.SALARY.gt(manager.SALARY))
+                  .fetch();
+
+          final List<String> employeeNames = results.getValues("Subordinate", String.class);
+
+          assertEquals(1, employeeNames.size(), "Expected exactly one subordinate");
+          assertTrue(
+              employeeNames.contains("Joe"),
+              "Expected 'Joe' to be the subordinate earning more than their manager");
+        });
+  }
 }
