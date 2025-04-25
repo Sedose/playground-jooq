@@ -1,7 +1,7 @@
 # Java + Gradle + JOOQ + Flyway + Spotless + Google style auto formatting + Checkstyle + Python automation script
 ## Getting started
 - Create a free PostgreSQL instance. \
-  👉 https://app.koyeb.com/
+  👉 https://app.koyeb.com/ (this site will give you credentials to access PostgreSQL)
 - Create a file at: `src/test/resources/application.properties`. \
   Example content:
 
@@ -22,10 +22,11 @@ jdbc.password=db_password
 python3 build_and_sync.py 
 ```
 
-#### 💡 Create a `.env` file with the correct DB credentials.
+#### 💡 Create an `.env` file in the root of the project with the correct DB credentials.
 #### Example:
 ```
 DB_URL=jdbc:postgresql://ep-abcd-mavpa-a22n3nhs.eu-central-1.pg.koyeb.app/db_name
 DB_USER=db_username
 DB_PASSWORD=db_password
 ```
+And then run the Python script
