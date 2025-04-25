@@ -2,42 +2,38 @@ import os
 import subprocess
 import sys
 
+properties = {
+    propertyKey: propertyValue
+    for propertyKey, propertyValue in (
+        line.strip().split("=", 1)
+        for line in open("src/test/resources/application.properties")
+    )
+    if propertyKey and not propertyKey.startswith("#")
+}
 
-def load_env_file(path=".env"):
-    if not os.path.exists(path):
-        print(f"⚠️  {path} file not found. Skipping .env load.")
-        return
-    with open(path) as file:
-        for line in file:
-            if "=" in line and not line.lstrip().startswith("#"):
-                key, value = map(str.strip, line.strip().split("=", 1))
-                os.environ[key] = value
+os.environ.update(
+    DB_URL=properties["jdbc.url"],
+    DB_USER=properties["jdbc.username"],
+    DB_PASSWORD=properties["jdbc.password"],
+)
 
+taskArgumentsList = [
+    # ["clean"],
+    # ["flywayClean", "-Dflyway.cleanDisabled=false"],
+    ["spotlessApply"],
+    ["assemble"],
+    ["flywayMigrate"],
+    ["generateJooq"],
+    ["test"],
+]
 
-def run_command(command, step_name):
-    print(f"\n🟡 {step_name}...")
-    try:
-        subprocess.run(command, check=True, env=os.environ)
-        print(f"✅ {step_name} — done")
-    except subprocess.CalledProcessError:
-        print(f"❌ {step_name} — failed")
-        sys.exit(1)
+for taskArguments in taskArgumentsList:
+    fullCommand = ["./gradlew", *taskArguments]
+    print(f"🟡 Running {fullCommand}…")
+    executionResult = subprocess.run(fullCommand, env=os.environ)
+    if executionResult.returncode != 0:
+        print(f"❌ {fullCommand} — failed (exit {executionResult.returncode})")
+        sys.exit(executionResult.returncode)
+    print(f"✅ {fullCommand} — done")
 
-
-def main():
-    load_env_file()
-    steps = [
-        # (["./gradlew", "clean"], "Clean"),
-        # (["./gradlew", "flywayClean", "-Dflyway.cleanDisabled=false"], "Clean"),
-        (["./gradlew", "spotlessApply"], "Spotless apply"),
-        (["./gradlew", "assemble"], "Gradle build"),
-        (["./gradlew", "flywayMigrate"], "Flyway migrate"),
-        (["./gradlew", "generateJooq"], "jOOQ code generation"),
-        (["./gradlew", "test"], "Running tests"),
-    ]
-    for command, step_name in steps:
-        run_command(command, step_name)
-
-
-if __name__ == "__main__":
-    main()
+print("🏆 All steps completed successfully")
