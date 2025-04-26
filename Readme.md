@@ -11,7 +11,7 @@ jdbc.username=db_username
 jdbc.password=db_password
 ```
 
-- Run python3 build_and_sync.py in your terminal.
+- Run ./gradlew ciPipeline in your terminal.
 - Execute the unit tests suite to verify DB connectivity and see JOOQ in action.
 - Review and debug the unit tests to understand how JOOQ interacts with the DB.
 - Feel free to modify queries, add assertions, and experiment

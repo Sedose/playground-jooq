@@ -1,5 +1,5 @@
 import nu.studer.gradle.jooq.JooqEdition
-import java.lang.System.getenv
+import java.util.Properties
 
 buildscript {
   repositories {
@@ -19,6 +19,20 @@ plugins {
   id("org.flywaydb.flyway") version "11.4.0"
   id("nu.studer.jooq") version "10.0"
 }
+
+private val loadedDatabaseProperties =
+  Properties().apply {
+    file("src/test/resources/application.properties")
+      .inputStream()
+      .use { load(it) }
+  }
+
+val databaseSettings =
+  mapOf(
+    "url" to loadedDatabaseProperties.getProperty("jdbc.url"),
+    "username" to loadedDatabaseProperties.getProperty("jdbc.username"),
+    "password" to loadedDatabaseProperties.getProperty("jdbc.password"),
+  )
 
 repositories {
   mavenCentral()
@@ -46,11 +60,12 @@ tasks.test {
 }
 
 flyway {
-  url = getenv("DB_URL")
-  user = getenv("DB_USER")
-  password = getenv("DB_PASSWORD")
+  url = databaseSettings["url"]
+  user = databaseSettings["username"]
+  password = databaseSettings["password"]
   driver = "org.postgresql.Driver"
   locations = arrayOf("classpath:db/migration")
+  cleanDisabled = false // dangerous in prod env - it drops tables in DB
 }
 
 jooq {
@@ -62,9 +77,9 @@ jooq {
       jooqConfiguration.apply {
         jdbc.apply {
           driver = "org.postgresql.Driver"
-          url = getenv("DB_URL")
-          user = getenv("DB_USER")
-          password = getenv("DB_PASSWORD")
+          url = databaseSettings["url"]
+          user = databaseSettings["username"]
+          password = databaseSettings["password"]
         }
         generator.apply {
           name = "org.jooq.codegen.JavaGenerator"
@@ -97,4 +112,26 @@ checkstyle {
 
 tasks.withType<Checkstyle> {
   exclude("**/generated/**")
+}
+
+val generateJooq by tasks.existing
+
+tasks.named<JavaCompile>("compileJava") {
+  dependsOn(generateJooq)
+}
+
+sourceSets["main"].java.srcDir(
+  layout.buildDirectory.dir("generated-src/jooq/main")
+)
+
+tasks.register("ciPipeline") {
+  dependsOn(
+    "clean",
+    "flywayClean",
+    "spotlessApply",
+    "assemble",
+    "flywayMigrate",
+    "generateJooq",
+    "test",
+  )
 }
