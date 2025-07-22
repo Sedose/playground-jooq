@@ -1,5 +1,7 @@
 import nu.studer.gradle.jooq.JooqEdition
 import java.util.Properties
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption
 
 buildscript {
   repositories {
@@ -134,4 +136,40 @@ tasks.register("ciPipeline") {
     "generateJooq",
     "test",
   )
+}
+
+tasks.register("copySourcesToClipboard") {
+    group = "custom"
+    description = "Collects project files and copies them to clipboard"
+
+    doLast {
+        val projectRoot = project.projectDir.toPath()
+
+        val javaFiles =
+            Files.walk(projectRoot.resolve("src"))
+                .filter { it.toString().endsWith(".java") }
+                .toList()
+
+        val extraFiles =
+            listOf("README.md", "AGENTS.md", "build.gradle.kts")
+                .map { projectRoot.resolve(it) }
+                .filter { Files.exists(it) }
+
+        val allFiles = javaFiles + extraFiles
+
+        val combined =
+            allFiles.joinToString(System.lineSeparator().repeat(2)) { path ->
+                Files.readString(path)
+            }
+
+        val tmpFile = Files.createTempFile("collected", ".txt")
+        Files.writeString(tmpFile, combined, StandardOpenOption.TRUNCATE_EXISTING)
+
+        exec {
+            commandLine("clip.exe")
+            standardInput = tmpFile.toFile().inputStream()
+        }
+
+        println("Copied ${allFiles.size} files to clipboard.")
+    }
 }
