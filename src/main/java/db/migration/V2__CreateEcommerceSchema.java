@@ -14,8 +14,8 @@ public class V2__CreateEcommerceSchema extends BaseJavaMigration {
     final DSLContext dslContext = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
 
     dslContext
-        .createTableIfNotExists("customers")
-        .column("id", SQLDataType.BIGINT.nullable(false).identity(true))
+        .createTableIfNotExists("customer")
+        .column("customer_id", SQLDataType.BIGINT.nullable(false).identity(true))
         .column("email", SQLDataType.VARCHAR(255).nullable(false))
         .column("full_name", SQLDataType.VARCHAR(255).nullable(false))
         .column(
@@ -23,12 +23,12 @@ public class V2__CreateEcommerceSchema extends BaseJavaMigration {
             SQLDataType.TIMESTAMP
                 .nullable(false)
                 .defaultValue(DSL.field("NOW()", SQLDataType.TIMESTAMP)))
-        .constraints(DSL.constraint("pk_customers").primaryKey("id"))
+        .constraints(DSL.constraint("pk_customer").primaryKey("customer_id"))
         .execute();
 
     dslContext
-        .createTableIfNotExists("products")
-        .column("id", SQLDataType.BIGINT.nullable(false).identity(true))
+        .createTableIfNotExists("product")
+        .column("product_id", SQLDataType.BIGINT.nullable(false).identity(true))
         .column("name", SQLDataType.VARCHAR(255).nullable(false))
         .column("description", SQLDataType.CLOB)
         .column("price", SQLDataType.DECIMAL(10, 2).nullable(false))
@@ -37,33 +37,33 @@ public class V2__CreateEcommerceSchema extends BaseJavaMigration {
             SQLDataType.TIMESTAMP
                 .nullable(false)
                 .defaultValue(DSL.field("NOW()", SQLDataType.TIMESTAMP)))
-        .constraints(DSL.constraint("pk_products").primaryKey("id"))
+        .constraints(DSL.constraint("pk_product").primaryKey("product_id"))
         .execute();
 
     dslContext
-        .createTableIfNotExists("categories")
-        .column("id", SQLDataType.BIGINT.nullable(false).identity(true))
+        .createTableIfNotExists("category")
+        .column("category_id", SQLDataType.BIGINT.nullable(false).identity(true))
         .column("name", SQLDataType.VARCHAR(100).nullable(false))
-        .constraints(DSL.constraint("pk_categories").primaryKey("id"))
+        .constraints(DSL.constraint("pk_category").primaryKey("category_id"))
         .execute();
 
     dslContext
-        .createTableIfNotExists("product_categories")
+        .createTableIfNotExists("product_category")
         .column("product_id", SQLDataType.BIGINT.nullable(false))
         .column("category_id", SQLDataType.BIGINT.nullable(false))
         .constraints(
-            DSL.constraint("pk_product_categories").primaryKey("product_id", "category_id"),
-            DSL.constraint("fk_product_categories_product_id")
+            DSL.constraint("pk_product_category").primaryKey("product_id", "category_id"),
+            DSL.constraint("fk_product_category_product_id")
                 .foreignKey("product_id")
-                .references("products", "id"),
-            DSL.constraint("fk_product_categories_category_id")
+                .references("product", "product_id"),
+            DSL.constraint("fk_product_category_category_id")
                 .foreignKey("category_id")
-                .references("categories", "id"))
+                .references("category", "category_id"))
         .execute();
 
     dslContext
-        .createTableIfNotExists("orders")
-        .column("id", SQLDataType.BIGINT.nullable(false).identity(true))
+        .createTableIfNotExists("customer_order")
+        .column("customer_order_id", SQLDataType.BIGINT.nullable(false).identity(true))
         .column("customer_id", SQLDataType.BIGINT.nullable(false))
         .column(
             "order_date",
@@ -72,27 +72,27 @@ public class V2__CreateEcommerceSchema extends BaseJavaMigration {
                 .defaultValue(DSL.field("NOW()", SQLDataType.TIMESTAMP)))
         .column("total_amount", SQLDataType.DECIMAL(10, 2).nullable(false))
         .constraints(
-            DSL.constraint("pk_orders").primaryKey("id"),
-            DSL.constraint("fk_orders_customer_id")
+            DSL.constraint("pk_customer_order").primaryKey("customer_order_id"),
+            DSL.constraint("fk_customer_order_customer_id")
                 .foreignKey("customer_id")
-                .references("customers", "id"))
+                .references("customer", "customer_id"))
         .execute();
 
     dslContext
-        .createTableIfNotExists("order_items")
-        .column("id", SQLDataType.BIGINT.nullable(false).identity(true))
-        .column("order_id", SQLDataType.BIGINT.nullable(false))
+        .createTableIfNotExists("order_item")
+        .column("order_item_id", SQLDataType.BIGINT.nullable(false).identity(true))
+        .column("customer_order_id", SQLDataType.BIGINT.nullable(false))
         .column("product_id", SQLDataType.BIGINT.nullable(false))
         .column("quantity", SQLDataType.INTEGER.nullable(false))
         .column("unit_price", SQLDataType.DECIMAL(10, 2).nullable(false))
         .constraints(
-            DSL.constraint("pk_order_items").primaryKey("id"),
-            DSL.constraint("fk_order_items_order_id")
-                .foreignKey("order_id")
-                .references("orders", "id"),
-            DSL.constraint("fk_order_items_product_id")
+            DSL.constraint("pk_order_item").primaryKey("order_item_id"),
+            DSL.constraint("fk_order_item_customer_order_id")
+                .foreignKey("customer_order_id")
+                .references("customer_order", "customer_order_id"),
+            DSL.constraint("fk_order_item_product_id")
                 .foreignKey("product_id")
-                .references("products", "id"))
+                .references("product", "product_id"))
         .execute();
   }
 }

@@ -1,15 +1,15 @@
 package org.example;
 
 import static org.jooq.generated.Tables.ADDRESS;
-import static org.jooq.generated.Tables.CATEGORIES;
-import static org.jooq.generated.Tables.CUSTOMERS;
+import static org.jooq.generated.Tables.CATEGORY;
+import static org.jooq.generated.Tables.CUSTOMER;
+import static org.jooq.generated.Tables.CUSTOMER_ORDER;
 import static org.jooq.generated.Tables.EMPLOYEE;
 import static org.jooq.generated.Tables.FLYWAY_SCHEMA_HISTORY;
-import static org.jooq.generated.Tables.ORDERS;
-import static org.jooq.generated.Tables.ORDER_ITEMS;
+import static org.jooq.generated.Tables.ORDER_ITEM;
 import static org.jooq.generated.Tables.PERSON;
-import static org.jooq.generated.Tables.PRODUCTS;
-import static org.jooq.generated.Tables.PRODUCT_CATEGORIES;
+import static org.jooq.generated.Tables.PRODUCT;
+import static org.jooq.generated.Tables.PRODUCT_CATEGORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.jooq.Record;
-import org.jooq.generated.tables.records.CategoriesRecord;
+import org.jooq.generated.tables.records.CategoryRecord;
 import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Test;
 
@@ -46,9 +46,9 @@ public class MainTest {
   void testFetchAllCategories() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var categories = dsl.selectFrom(CATEGORIES).fetch();
+          final var categories = dsl.selectFrom(CATEGORY).fetch();
           assertTrue(categories.size() >= 4);
-          final var categoryNames = categories.stream().map(CategoriesRecord::getName).toList();
+          final var categoryNames = categories.stream().map(CategoryRecord::getName).toList();
           assertTrue(
               categoryNames.containsAll(List.of("Books", "Electronics", "Computers", "Games")));
         });
@@ -58,7 +58,7 @@ public class MainTest {
   void testFetchAllCustomers() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var records = dsl.selectFrom(CUSTOMERS).fetch();
+          final var records = dsl.selectFrom(CUSTOMER).fetch();
           assertFalse(records.isEmpty());
         });
   }
@@ -76,7 +76,7 @@ public class MainTest {
   void testFetchAllOrderItems() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var records = dsl.selectFrom(ORDER_ITEMS).fetch();
+          final var records = dsl.selectFrom(ORDER_ITEM).fetch();
           assertFalse(records.isEmpty());
         });
   }
@@ -85,7 +85,7 @@ public class MainTest {
   void testFetchAllOrders() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var records = dsl.selectFrom(ORDERS).fetch();
+          final var records = dsl.selectFrom(CUSTOMER_ORDER).fetch();
           assertFalse(records.isEmpty());
         });
   }
@@ -94,7 +94,7 @@ public class MainTest {
   void testFetchAllProductCategories() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var records = dsl.selectFrom(PRODUCT_CATEGORIES).fetch();
+          final var records = dsl.selectFrom(PRODUCT_CATEGORY).fetch();
           assertFalse(records.isEmpty());
         });
   }
@@ -103,7 +103,7 @@ public class MainTest {
   void testFetchAllProducts() {
     TestDatabaseConfig.withDslContext(
         dsl -> {
-          final var records = dsl.selectFrom(PRODUCTS).fetch();
+          final var records = dsl.selectFrom(PRODUCT).fetch();
           assertFalse(records.isEmpty());
         });
   }
@@ -113,17 +113,21 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(ORDERS.ID, CUSTOMERS.FULL_NAME, ORDERS.ORDER_DATE, ORDERS.TOTAL_AMOUNT)
-                  .from(ORDERS)
-                  .join(CUSTOMERS)
-                  .on(ORDERS.CUSTOMER_ID.eq(CUSTOMERS.ID))
+              dsl.select(
+                      CUSTOMER_ORDER.CUSTOMER_ORDER_ID,
+                      CUSTOMER.FULL_NAME,
+                      CUSTOMER_ORDER.ORDER_DATE,
+                      CUSTOMER_ORDER.TOTAL_AMOUNT)
+                  .from(CUSTOMER_ORDER)
+                  .join(CUSTOMER)
+                  .on(CUSTOMER_ORDER.CUSTOMER_ID.eq(CUSTOMER.CUSTOMER_ID))
                   .fetch();
 
           assertFalse(results.isEmpty());
           results.forEach(
               record -> {
-                assertNotNull(record.get(CUSTOMERS.FULL_NAME));
-                assertNotNull(record.get(ORDERS.ORDER_DATE));
+                assertNotNull(record.get(CUSTOMER.FULL_NAME));
+                assertNotNull(record.get(CUSTOMER_ORDER.ORDER_DATE));
               });
         });
   }
@@ -133,18 +137,18 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(PRODUCTS.ID, PRODUCTS.NAME, CATEGORIES.NAME.as("category_name"))
-                  .from(PRODUCTS)
-                  .join(PRODUCT_CATEGORIES)
-                  .on(PRODUCTS.ID.eq(PRODUCT_CATEGORIES.PRODUCT_ID))
-                  .join(CATEGORIES)
-                  .on(PRODUCT_CATEGORIES.CATEGORY_ID.eq(CATEGORIES.ID))
+              dsl.select(PRODUCT.PRODUCT_ID, PRODUCT.NAME, CATEGORY.NAME.as("category_name"))
+                  .from(PRODUCT)
+                  .join(PRODUCT_CATEGORY)
+                  .on(PRODUCT.PRODUCT_ID.eq(PRODUCT_CATEGORY.PRODUCT_ID))
+                  .join(CATEGORY)
+                  .on(PRODUCT_CATEGORY.CATEGORY_ID.eq(CATEGORY.CATEGORY_ID))
                   .fetch();
 
           assertFalse(results.isEmpty());
           results.forEach(
               record -> {
-                assertNotNull(record.get(PRODUCTS.NAME));
+                assertNotNull(record.get(PRODUCT.NAME));
                 assertNotNull(record.get("category_name"));
               });
         });
@@ -156,20 +160,20 @@ public class MainTest {
         dsl -> {
           final var results =
               dsl.select(
-                      ORDER_ITEMS.ORDER_ID,
-                      PRODUCTS.NAME.as("product_name"),
-                      ORDER_ITEMS.QUANTITY,
-                      ORDER_ITEMS.UNIT_PRICE)
-                  .from(ORDER_ITEMS)
-                  .join(PRODUCTS)
-                  .on(ORDER_ITEMS.PRODUCT_ID.eq(PRODUCTS.ID))
+                      ORDER_ITEM.CUSTOMER_ORDER_ID,
+                      PRODUCT.NAME.as("product_name"),
+                      ORDER_ITEM.QUANTITY,
+                      ORDER_ITEM.UNIT_PRICE)
+                  .from(ORDER_ITEM)
+                  .join(PRODUCT)
+                  .on(ORDER_ITEM.PRODUCT_ID.eq(PRODUCT.PRODUCT_ID))
                   .fetch();
 
           assertFalse(results.isEmpty());
           results.forEach(
               record -> {
                 assertNotNull(record.get("product_name"));
-                assertNotNull(record.get(ORDER_ITEMS.QUANTITY));
+                assertNotNull(record.get(ORDER_ITEM.QUANTITY));
               });
         });
   }
@@ -179,17 +183,17 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(CUSTOMERS.FULL_NAME, DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
-                  .from(CUSTOMERS)
-                  .join(ORDERS)
-                  .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
-                  .groupBy(CUSTOMERS.FULL_NAME)
+              dsl.select(CUSTOMER.FULL_NAME, DSL.sum(CUSTOMER_ORDER.TOTAL_AMOUNT).as("total_spent"))
+                  .from(CUSTOMER)
+                  .join(CUSTOMER_ORDER)
+                  .on(CUSTOMER.CUSTOMER_ID.eq(CUSTOMER_ORDER.CUSTOMER_ID))
+                  .groupBy(CUSTOMER.FULL_NAME)
                   .fetch();
 
           assertFalse(results.isEmpty());
           results.forEach(
               record -> {
-                assertNotNull(record.get(CUSTOMERS.FULL_NAME));
+                assertNotNull(record.get(CUSTOMER.FULL_NAME));
                 assertNotNull(record.get("total_spent"));
               });
         });
@@ -200,19 +204,19 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(CATEGORIES.NAME, DSL.count(PRODUCTS.ID).as("product_count"))
-                  .from(CATEGORIES)
-                  .join(PRODUCT_CATEGORIES)
-                  .on(CATEGORIES.ID.eq(PRODUCT_CATEGORIES.CATEGORY_ID))
-                  .join(PRODUCTS)
-                  .on(PRODUCT_CATEGORIES.PRODUCT_ID.eq(PRODUCTS.ID))
-                  .groupBy(CATEGORIES.NAME)
+              dsl.select(CATEGORY.NAME, DSL.count(PRODUCT.PRODUCT_ID).as("product_count"))
+                  .from(CATEGORY)
+                  .join(PRODUCT_CATEGORY)
+                  .on(CATEGORY.CATEGORY_ID.eq(PRODUCT_CATEGORY.CATEGORY_ID))
+                  .join(PRODUCT)
+                  .on(PRODUCT_CATEGORY.PRODUCT_ID.eq(PRODUCT.PRODUCT_ID))
+                  .groupBy(CATEGORY.NAME)
                   .fetch();
 
           assertFalse(results.isEmpty());
           results.forEach(
               record -> {
-                assertNotNull(record.get(CATEGORIES.NAME));
+                assertNotNull(record.get(CATEGORY.NAME));
                 assertTrue(((Integer) record.get("product_count")) > 0);
               });
         });
@@ -224,21 +228,21 @@ public class MainTest {
         dsl -> {
           final var results =
               dsl.select(
-                      CUSTOMERS.ID,
-                      CUSTOMERS.FULL_NAME,
-                      DSL.sum(ORDERS.TOTAL_AMOUNT).as("total_spent"))
-                  .from(ORDERS)
-                  .join(CUSTOMERS)
-                  .on(ORDERS.CUSTOMER_ID.eq(CUSTOMERS.ID))
-                  .groupBy(CUSTOMERS.ID, CUSTOMERS.FULL_NAME)
-                  .orderBy(DSL.sum(ORDERS.TOTAL_AMOUNT).desc())
+                      CUSTOMER.CUSTOMER_ID,
+                      CUSTOMER.FULL_NAME,
+                      DSL.sum(CUSTOMER_ORDER.TOTAL_AMOUNT).as("total_spent"))
+                  .from(CUSTOMER_ORDER)
+                  .join(CUSTOMER)
+                  .on(CUSTOMER_ORDER.CUSTOMER_ID.eq(CUSTOMER.CUSTOMER_ID))
+                  .groupBy(CUSTOMER.CUSTOMER_ID, CUSTOMER.FULL_NAME)
+                  .orderBy(DSL.sum(CUSTOMER_ORDER.TOTAL_AMOUNT).desc())
                   .limit(2)
                   .fetch();
 
           assertEquals(2, results.size());
           results.forEach(
               record -> {
-                assertNotNull(record.get(CUSTOMERS.FULL_NAME));
+                assertNotNull(record.get(CUSTOMER.FULL_NAME));
                 assertNotNull(record.get("total_spent"));
               });
         });
@@ -250,18 +254,18 @@ public class MainTest {
         dsl -> {
           final var results =
               dsl.select(
-                      CUSTOMERS.FULL_NAME,
-                      ORDERS.ID.as("order_id"),
-                      ORDERS.ORDER_DATE,
-                      ORDERS.TOTAL_AMOUNT)
-                  .from(CUSTOMERS)
-                  .leftJoin(ORDERS)
-                  .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
+                      CUSTOMER.FULL_NAME,
+                      CUSTOMER_ORDER.CUSTOMER_ORDER_ID.as("order_id"),
+                      CUSTOMER_ORDER.ORDER_DATE,
+                      CUSTOMER_ORDER.TOTAL_AMOUNT)
+                  .from(CUSTOMER)
+                  .leftJoin(CUSTOMER_ORDER)
+                  .on(CUSTOMER.CUSTOMER_ID.eq(CUSTOMER_ORDER.CUSTOMER_ID))
                   .fetch();
 
           assertFalse(results.isEmpty());
 
-          results.forEach(record -> assertNotNull(record.get(CUSTOMERS.FULL_NAME)));
+          results.forEach(record -> assertNotNull(record.get(CUSTOMER.FULL_NAME)));
         });
   }
 
@@ -270,18 +274,18 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var result =
-              dsl.select(CUSTOMERS.ID, CUSTOMERS.FULL_NAME)
-                  .from(CUSTOMERS)
-                  .leftJoin(ORDERS)
-                  .on(CUSTOMERS.ID.eq(ORDERS.CUSTOMER_ID))
-                  .where(ORDERS.ID.isNull())
+              dsl.select(CUSTOMER.CUSTOMER_ID, CUSTOMER.FULL_NAME)
+                  .from(CUSTOMER)
+                  .leftJoin(CUSTOMER_ORDER)
+                  .on(CUSTOMER.CUSTOMER_ID.eq(CUSTOMER_ORDER.CUSTOMER_ID))
+                  .where(CUSTOMER_ORDER.CUSTOMER_ORDER_ID.isNull())
                   .fetch();
 
           assertFalse(result.isEmpty(), "Expected customers without orders");
 
           result.forEach(
               record -> {
-                assertNotNull(record.get("id", Long.class));
+                assertNotNull(record.get("customer_id", Long.class));
                 assertNotNull(record.get("full_name", String.class));
               });
         });
@@ -292,18 +296,18 @@ public class MainTest {
     TestDatabaseConfig.withDslContext(
         dsl -> {
           final var results =
-              dsl.select(PERSON.FIRSTNAME, PERSON.LASTNAME, ADDRESS.CITY, ADDRESS.STATE)
+              dsl.select(PERSON.FIRST_NAME, PERSON.LAST_NAME, ADDRESS.CITY, ADDRESS.STATE)
                   .from(PERSON)
                   .leftJoin(ADDRESS)
-                  .using(PERSON.PERSONID)
+                  .using(PERSON.PERSON_ID)
                   .fetch();
 
           assertFalse(results.isEmpty());
 
           results.forEach(
               record -> {
-                assertNotNull(record.get(PERSON.FIRSTNAME));
-                assertNotNull(record.get(PERSON.LASTNAME));
+                assertNotNull(record.get(PERSON.FIRST_NAME));
+                assertNotNull(record.get(PERSON.LAST_NAME));
               });
         });
   }
@@ -319,7 +323,7 @@ public class MainTest {
               dsl.select(subordinate.NAME.as("Subordinate"))
                   .from(subordinate)
                   .join(manager)
-                  .on(subordinate.MANAGERID.eq(manager.ID))
+                  .on(subordinate.MANAGER_ID.eq(manager.EMPLOYEE_ID))
                   .where(subordinate.SALARY.gt(manager.SALARY))
                   .fetch();
 

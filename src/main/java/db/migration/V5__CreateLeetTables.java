@@ -10,25 +10,25 @@ import org.jooq.impl.SQLDataType;
 public class V5__CreateLeetTables extends BaseJavaMigration {
   @Override
   public void migrate(Context context) {
-    DSLContext dslContext = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
+    final DSLContext dslContext = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
     dslContext
-        .createTableIfNotExists(DSL.name("Person"))
-        .column("personId", SQLDataType.INTEGER.nullable(false))
-        .column("lastName", SQLDataType.VARCHAR(100).nullable(false))
-        .column("firstName", SQLDataType.VARCHAR(100).nullable(false))
-        .constraints(DSL.constraint("pk_person").primaryKey("personId"))
+        .createTableIfNotExists(DSL.name("person"))
+        .column("person_id", SQLDataType.INTEGER.nullable(false))
+        .column("last_name", SQLDataType.VARCHAR(100).nullable(false))
+        .column("first_name", SQLDataType.VARCHAR(100).nullable(false))
+        .constraints(DSL.constraint("pk_person").primaryKey("person_id"))
         .execute();
     dslContext
-        .createTableIfNotExists(DSL.name("Address"))
-        .column("addressId", SQLDataType.INTEGER.nullable(false))
-        .column("personId", SQLDataType.INTEGER.nullable(false))
+        .createTableIfNotExists(DSL.name("address"))
+        .column("address_id", SQLDataType.INTEGER.nullable(false))
+        .column("person_id", SQLDataType.INTEGER.nullable(false))
         .column("city", SQLDataType.VARCHAR(100))
         .column("state", SQLDataType.VARCHAR(100))
         .constraints(
-            DSL.constraint("pk_address").primaryKey("addressId"),
+            DSL.constraint("pk_address").primaryKey("address_id"),
             DSL.constraint("fk_address_person")
-                .foreignKey("personId")
-                .references(DSL.name("Person"), DSL.name("personId")))
+                .foreignKey("person_id")
+                .references(DSL.name("person"), DSL.name("person_id")))
         .execute();
   }
 }

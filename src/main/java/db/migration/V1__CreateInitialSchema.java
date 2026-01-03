@@ -13,9 +13,9 @@ public class V1__CreateInitialSchema extends BaseJavaMigration {
   public void migrate(Context context) {
     final DSLContext dsl = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
     dsl.createTable("test_table")
-        .column("id", SQLDataType.INTEGER.nullable(false))
+        .column("test_table_id", SQLDataType.INTEGER.nullable(false))
         .column("name", SQLDataType.VARCHAR(100))
-        .constraints(DSL.constraint("pk_test_table").primaryKey("id"))
+        .constraints(DSL.constraint("pk_test_table").primaryKey("test_table_id"))
         .execute();
   }
 }

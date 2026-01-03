@@ -11,14 +11,14 @@ public class V6__InsertLeetcodeData extends BaseJavaMigration {
   public void migrate(Context context) {
     final DSLContext dsl = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
 
-    final var personTable = DSL.name("Person");
-    final var addressTable = DSL.name("Address");
+    final var personTable = DSL.name("person");
+    final var addressTable = DSL.name("address");
 
     dsl.insertInto(DSL.table(personTable))
         .columns(
-            DSL.field(DSL.name("personId")),
-            DSL.field(DSL.name("lastName")),
-            DSL.field(DSL.name("firstName")))
+            DSL.field(DSL.name("person_id")),
+            DSL.field(DSL.name("last_name")),
+            DSL.field(DSL.name("first_name")))
         .values(1, "Wang", "Allen")
         .values(2, "Alice", "Bob")
         .values(3, "Without", "Orders")
@@ -26,8 +26,8 @@ public class V6__InsertLeetcodeData extends BaseJavaMigration {
 
     dsl.insertInto(DSL.table(addressTable))
         .columns(
-            DSL.field(DSL.name("addressId")),
-            DSL.field(DSL.name("personId")),
+            DSL.field(DSL.name("address_id")),
+            DSL.field(DSL.name("person_id")),
             DSL.field(DSL.name("city")),
             DSL.field(DSL.name("state")))
         .values(1, 1, "New York City", "New York")

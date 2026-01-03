@@ -12,26 +12,26 @@ public class V7__CreateEmployeesSchema extends BaseJavaMigration {
   public void migrate(Context context) {
     final DSLContext dsl = DSL.using(context.getConnection(), SQLDialect.POSTGRES);
 
-    final var employee = DSL.name("Employee");
+    final var employee = DSL.name("employee");
 
     dsl.createTableIfNotExists(employee)
-        .column(DSL.name("id"), SQLDataType.INTEGER.nullable(false))
+        .column(DSL.name("employee_id"), SQLDataType.INTEGER.nullable(false))
         .column(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false))
         .column(DSL.name("salary"), SQLDataType.INTEGER.nullable(false))
-        .column(DSL.name("managerId"), SQLDataType.INTEGER)
+        .column(DSL.name("manager_id"), SQLDataType.INTEGER)
         .constraints(
-            DSL.constraint("pk_employee").primaryKey(DSL.name("id")),
+            DSL.constraint("pk_employee").primaryKey(DSL.name("employee_id")),
             DSL.constraint("fk_manager_id")
-                .foreignKey(DSL.name("managerId"))
-                .references(employee, DSL.name("id")))
+                .foreignKey(DSL.name("manager_id"))
+                .references(employee, DSL.name("employee_id")))
         .execute();
 
     dsl.insertInto(DSL.table(employee))
         .columns(
-            DSL.field(DSL.name("id")),
+            DSL.field(DSL.name("employee_id")),
             DSL.field(DSL.name("name")),
             DSL.field(DSL.name("salary")),
-            DSL.field(DSL.name("managerId")))
+            DSL.field(DSL.name("manager_id")))
         .values(1, "Joe", 70000, 3)
         .values(2, "Henry", 80000, 4)
         .values(3, "Sam", 60000, null)
