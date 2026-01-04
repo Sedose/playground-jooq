@@ -1,20 +1,4 @@
-# Repository Guidelines
-
-## Build, Test, and Development Commands
-- `./gradlew ciPipeline` runs the full pipeline: clean, format, assemble, migrate, generate JOOQ, and tests.
-- `./gradlew test` runs the JUnit 5 test suite.
-- `./gradlew flywayMigrate` applies DB migrations; `./gradlew flywayClean` resets the DB (destructive).
-- `./gradlew generateJooq` regenerates JOOQ sources from the configured database schema.
-- `./gradlew spotlessApply` formats Java with Google Java Format and trims whitespace.
-- `./gradlew assemble` builds the project artifacts.
-
-## Coding Style & Naming Conventions
-- Java formatting is enforced by Spotless with Google Java Format; keep code compatible with it.
-- Checkstyle is enabled; review `config/checkstyle/checkstyle.xml` for rules.
-- Migration classes follow Flyway naming: `V{number}__{Description}.java`.
-- Test classes use `*Test.java` (e.g., `MainTest.java`).
-
-## **Programming style, code characteristics, philosophy**
+## **Programming style, code characteristics, philosophy to use**
 * **Pipeline programming**
 * **Data-oriented programming**
 * **Functional-like programming**

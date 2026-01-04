@@ -95,7 +95,7 @@ jooq {
               password = databaseSettings["password"]
             }
             generator.apply {
-              name = "org.jooq.codegen.JavaGenerator"
+              name = "org.jooq.codegen.KotlinGenerator"
               database.apply {
                 name = "org.jooq.meta.postgres.PostgresDatabase"
                 inputSchema = "public"
@@ -104,6 +104,7 @@ jooq {
               }
               target.apply {
                 directory = generatedJooqDir.asFile.path
+                packageName = "org.jooq.generated"
               }
             }
           }
@@ -117,6 +118,9 @@ val generateJooq by tasks.existing
 
 tasks.named("generateJooq") {
   dependsOn("flywayMigrate")
+  doFirst {
+    project.delete(layout.projectDirectory.dir("src/main/generated/jooq"))
+  }
 }
 
 tasks.named("flywayMigrate") {
@@ -128,10 +132,10 @@ tasks.named<KotlinCompile>("compileTestKotlin") {
   dependsOn(generateJooq)
 }
 
-sourceSets["main"].java.srcDir(
+sourceSets["main"].kotlin.srcDir(
   layout.projectDirectory.dir("src/main/generated/jooq")
 )
-sourceSets["test"].java.srcDir(
+sourceSets["test"].kotlin.srcDir(
   layout.projectDirectory.dir("src/main/generated/jooq")
 )
 

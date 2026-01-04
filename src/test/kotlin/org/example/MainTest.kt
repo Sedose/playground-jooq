@@ -2,17 +2,17 @@ package org.example
 
 import java.sql.Timestamp
 import org.jooq.Records
-import org.jooq.generated.Tables.ADDRESS
-import org.jooq.generated.Tables.CATEGORY
-import org.jooq.generated.Tables.CUSTOMER
-import org.jooq.generated.Tables.CUSTOMER_ORDER
-import org.jooq.generated.Tables.EMPLOYEE
-import org.jooq.generated.Tables.FLYWAY_SCHEMA_HISTORY
-import org.jooq.generated.Tables.MANAGER
-import org.jooq.generated.Tables.ORDER_ITEM
-import org.jooq.generated.Tables.PERSON
-import org.jooq.generated.Tables.PRODUCT
-import org.jooq.generated.Tables.PRODUCT_CATEGORY
+import org.jooq.generated.tables.Address.Companion.ADDRESS
+import org.jooq.generated.tables.Category.Companion.CATEGORY
+import org.jooq.generated.tables.Customer.Companion.CUSTOMER
+import org.jooq.generated.tables.CustomerOrder.Companion.CUSTOMER_ORDER
+import org.jooq.generated.tables.Employee.Companion.EMPLOYEE
+import org.jooq.generated.tables.FlywaySchemaHistory.Companion.FLYWAY_SCHEMA_HISTORY
+import org.jooq.generated.tables.Manager.Companion.MANAGER
+import org.jooq.generated.tables.OrderItem.Companion.ORDER_ITEM
+import org.jooq.generated.tables.Person.Companion.PERSON
+import org.jooq.generated.tables.Product.Companion.PRODUCT
+import org.jooq.generated.tables.ProductCategory.Companion.PRODUCT_CATEGORY
 import org.jooq.generated.tables.records.CategoryRecord
 import org.jooq.impl.DSL
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,7 +44,7 @@ class MainTest {
     TestDatabaseConfig.withDslContext { dsl ->
       val categories = dsl.selectFrom(CATEGORY).fetch()
       assertTrue(categories.size >= 4)
-      val categoryNames = categories.map(CategoryRecord::getName)
+      val categoryNames = categories.mapNotNull(CategoryRecord::name)
       assertTrue(categoryNames.containsAll(listOf("Books", "Electronics", "Computers", "Games")))
     }
   }
