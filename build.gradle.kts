@@ -1,6 +1,7 @@
 import nu.studer.gradle.jooq.JooqEdition
 import nu.studer.gradle.jooq.JooqConfig
 import org.gradle.api.Action
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Properties
 
 buildscript {
@@ -15,11 +16,10 @@ buildscript {
 apply(plugin = "org.flywaydb.flyway")
 
 plugins {
-  java
-  checkstyle
-  id("com.diffplug.spotless") version "8.1.0"
+  kotlin("jvm") version "2.3.0"
   id("org.flywaydb.flyway") version "11.20.0"
   id("nu.studer.jooq") version "10.2"
+  id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 }
 
 private val loadedDatabaseProperties =
@@ -50,6 +50,7 @@ repositories {
 }
 
 dependencies {
+  implementation(kotlin("stdlib"))
   implementation ("org.slf4j:slf4j-api:2.0.17")
   implementation ("ch.qos.logback:logback-classic:1.5.23")
   jooqGenerator("org.postgresql:postgresql:42.7.8")
@@ -58,10 +59,6 @@ dependencies {
   implementation("org.jooq:jooq-meta:3.20.10")
   implementation("org.jooq:jooq-codegen:3.20.10")
   implementation("org.postgresql:postgresql:42.7.8")
-  compileOnly("org.projectlombok:lombok:1.18.42")
-  annotationProcessor("org.projectlombok:lombok:1.18.42")
-  testCompileOnly("org.projectlombok:lombok:1.18.42")
-  testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
   testImplementation(platform("org.junit:junit-bom:5.14.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -116,26 +113,6 @@ jooq {
   }
 }
 
-spotless {
-  java {
-    googleJavaFormat()
-    target("src/**/*.java")
-    targetExclude("src/main/generated/**")
-    removeUnusedImports()
-    trimTrailingWhitespace()
-    endWithNewline()
-  }
-}
-
-checkstyle {
-  toolVersion = "10.22.0"
-  isShowViolations = true
-}
-
-tasks.withType<Checkstyle> {
-  exclude("**/generated/**")
-}
-
 val generateJooq by tasks.existing
 
 tasks.named("generateJooq") {
@@ -143,11 +120,11 @@ tasks.named("generateJooq") {
 }
 
 tasks.named("flywayMigrate") {
-  dependsOn("classes")
+  dependsOn("compileKotlin")
   mustRunAfter("flywayClean")
 }
 
-tasks.named<JavaCompile>("compileTestJava") {
+tasks.named<KotlinCompile>("compileTestKotlin") {
   dependsOn(generateJooq)
 }
 
@@ -162,7 +139,6 @@ tasks.register("ciPipeline") {
   dependsOn(
     "clean",
     "flywayClean",
-    "spotlessApply",
     "assemble",
     "flywayMigrate",
     "generateJooq",
