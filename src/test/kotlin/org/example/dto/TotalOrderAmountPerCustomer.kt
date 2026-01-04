@@ -1,9 +1,8 @@
-package org.example
+package org.example.dto
 
 import java.math.BigDecimal
 
-data class TopCustomerBySpend(
-  val customerId: Long,
+data class TotalOrderAmountPerCustomer(
   val fullName: String,
   val totalSpent: BigDecimal,
 )

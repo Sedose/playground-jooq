@@ -1,4 +1,4 @@
-package org.example
+package org.example.dto
 
 data class PersonAddressDetails(
   val firstName: String,

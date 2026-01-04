@@ -1,5 +1,15 @@
 package org.example
 
+import org.example.dto.CustomerOrderSummary
+import org.example.dto.CustomerWithoutOrder
+import org.example.dto.OrderItemWithProductDetails
+import org.example.dto.OrderWithCustomerDetails
+import org.example.dto.PersonAddressDetails
+import org.example.dto.ProductCountPerCategory
+import org.example.dto.ProductWithCategory
+import org.example.dto.SubordinateName
+import org.example.dto.TopCustomerBySpend
+import org.example.dto.TotalOrderAmountPerCustomer
 import org.jooq.Records
 import org.jooq.generated.tables.Address.Companion.ADDRESS
 import org.jooq.generated.tables.Category.Companion.CATEGORY
