@@ -8,6 +8,7 @@ import org.jooq.generated.Tables.CUSTOMER
 import org.jooq.generated.Tables.CUSTOMER_ORDER
 import org.jooq.generated.Tables.EMPLOYEE
 import org.jooq.generated.Tables.FLYWAY_SCHEMA_HISTORY
+import org.jooq.generated.Tables.MANAGER
 import org.jooq.generated.Tables.ORDER_ITEM
 import org.jooq.generated.Tables.PERSON
 import org.jooq.generated.Tables.PRODUCT
@@ -287,13 +288,13 @@ class MainTest {
   fun testSubordinatesWhoEarnMoreThanTheirManagers() {
     TestDatabaseConfig.withDslContext { dsl ->
       val subordinate = EMPLOYEE.`as`("subordinate")
-      val manager = EMPLOYEE.`as`("manager")
+      val manager = MANAGER.`as`("manager")
 
       val results =
           dsl.select(subordinate.NAME)
               .from(subordinate)
               .join(manager)
-              .on(subordinate.MANAGER_ID.eq(manager.EMPLOYEE_ID))
+              .on(subordinate.MANAGER_ID.eq(manager.MANAGER_ID))
               .where(subordinate.SALARY.gt(manager.SALARY))
               .fetch(Records.mapping(::SubordinateName))
 
