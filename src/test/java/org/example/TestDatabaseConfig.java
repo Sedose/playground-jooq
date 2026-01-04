@@ -7,9 +7,13 @@ import java.sql.DriverManager;
 import java.util.Properties;
 import java.util.function.Consumer;
 import lombok.SneakyThrows;
+import org.jooq.ExecuteContext;
+import org.jooq.ExecuteListener;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
+import org.jooq.impl.DefaultConfiguration;
+import org.jooq.impl.DefaultExecuteListenerProvider;
 import org.jooq.impl.DSL;
 
 public class TestDatabaseConfig {
@@ -20,7 +24,12 @@ public class TestDatabaseConfig {
     try (final Connection connection =
         DriverManager.getConnection(config.url(), config.username(), config.password())) {
       final Settings settings = new Settings().withExecuteLogging(true);
-      final DSLContext sqlContext = DSL.using(connection, SQLDialect.POSTGRES, settings);
+      final DefaultConfiguration configuration = new DefaultConfiguration();
+      configuration.set(connection);
+      configuration.set(SQLDialect.POSTGRES);
+      configuration.set(settings);
+      configuration.set(new DefaultExecuteListenerProvider(new SqlPrintListener()));
+      final DSLContext sqlContext = DSL.using(configuration);
       testLogic.accept(sqlContext);
     }
   }
@@ -43,4 +52,13 @@ public class TestDatabaseConfig {
   }
 
   public record DatabaseConnectionSettings(String url, String username, String password) {}
+
+  private static final class SqlPrintListener implements ExecuteListener {
+    @Override
+    public void renderEnd(ExecuteContext ctx) {
+      if (ctx.sql() != null) {
+        System.out.println("jOOQ SQL: " + ctx.sql());
+      }
+    }
+  }
 }

@@ -1,13 +1,5 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-- `src/main/java` holds production code, including Flyway Java migrations in `src/main/java/db/migration` (e.g., `V1__CreateInitialSchema.java`).
-- `src/main/resources` contains runtime resources like `logback.xml`.
-- `src/test/java` contains JUnit tests and test DTOs under `org/example`.
-- `src/test/resources` stores test configuration, including `application.properties` with JDBC settings.
-- Generated JOOQ sources are written to `build/generated-src/jooq/main`.
-- Checkstyle rules live at `config/checkstyle/checkstyle.xml`.
-
 ## Build, Test, and Development Commands
 - `./gradlew ciPipeline` runs the full pipeline: clean, format, assemble, migrate, generate JOOQ, and tests.
 - `./gradlew test` runs the JUnit 5 test suite.
@@ -22,16 +14,23 @@
 - Migration classes follow Flyway naming: `V{number}__{Description}.java`.
 - Test classes use `*Test.java` (e.g., `MainTest.java`).
 
-## Testing Guidelines
-- Tests use JUnit 5 (`junit-jupiter`).
-- You must provide a local `src/test/resources/application.properties` with `jdbc.url`, `jdbc.username`, and `jdbc.password` to run DB-backed tests.
-- Add tests for new queries or schema changes and keep them deterministic.
-
-## Commit & Pull Request Guidelines
-- Commit subjects are short, imperative, and sentence case; optional conventional prefixes are acceptable (e.g., `refactor:`).
-- PRs should include a brief summary, the commands run (e.g., `./gradlew test`), and any DB migration notes.
-- Link relevant issues and call out schema or data changes explicitly.
-
-## Configuration & Security Notes
-- Do not commit real database credentials. Use local `application.properties` values for testing.
-- Treat `flywayClean` as a local-only operation; avoid it against shared databases.
+## **Programming style, code characteristics, philosophy**
+* **Pipeline programming**
+* **Data-oriented programming**
+* **Functional-like programming**
+* **Declarative-like programming**
+* **Side-effect isolation** (I/O only in `main`)
+* **Expression-oriented programming**
+* **Structured, composable functions**
+* **No mutable global state**
+* **Prefer not to have even local mutable state unless absolutely needed to gain smth much more valuable**
+* **Prefer not to have explicit `source code`-level loops unless absolutely needed to gain smth much more valuable**
+* **Pure functions**
+* **Minimal branching, maximal transformation**
+* **Clean, predictable control flow**
+* **Lean functional patterns**
+* **Less code means better. Keep code dense. Code is a liability, not an asset**
+* **The code is not opimized to gain maximum raw speed**
+* **The code is kept vertical, so it stays within a regular monitor size, no need for endless zooming, scroling nonsense**
+* **The code is opimized for correctness, simplicity and clarity**
+* **The code is straightforward like do 1, do 2, do 3, get result**
