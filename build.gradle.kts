@@ -13,8 +13,6 @@ buildscript {
   }
 }
 
-apply(plugin = "org.flywaydb.flyway")
-
 plugins {
   kotlin("jvm") version "2.3.0"
   id("org.flywaydb.flyway") version "11.20.0"
@@ -44,6 +42,8 @@ val databaseSettings =
     "username" to loadedDatabaseProperties.getProperty("jdbc.username"),
     "password" to loadedDatabaseProperties.getProperty("jdbc.password"),
   )
+
+val generatedJooqDir = file("src/main/jooq")
 
 repositories {
   mavenCentral()
@@ -85,7 +85,6 @@ flyway {
 
 jooq {
   edition.set(JooqEdition.OSS)
-  val generatedJooqDir = layout.projectDirectory.dir("src/main/generated/jooq")
 
   configurations {
     create(
@@ -109,7 +108,7 @@ jooq {
                 excludes = ""
               }
               target.apply {
-                directory = generatedJooqDir.asFile.path
+                directory = generatedJooqDir.path
                 packageName = "org.jooq.generated"
               }
             }
@@ -144,10 +143,10 @@ tasks.named<KotlinCompile>("compileTestKotlin") {
 }
 
 sourceSets["main"].kotlin.srcDir(
-  layout.projectDirectory.dir("src/main/generated/jooq"),
+  generatedJooqDir,
 )
 sourceSets["test"].kotlin.srcDir(
-  layout.projectDirectory.dir("src/main/generated/jooq"),
+  generatedJooqDir,
 )
 
 tasks.register("ciPipeline") {
