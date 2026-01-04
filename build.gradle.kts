@@ -1,5 +1,5 @@
-import nu.studer.gradle.jooq.JooqEdition
 import nu.studer.gradle.jooq.JooqConfig
+import nu.studer.gradle.jooq.JooqEdition
 import org.gradle.api.Action
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Properties
@@ -23,20 +23,20 @@ plugins {
 }
 
 private val loadedDatabaseProperties =
-    run {
-        val propertiesFile = file("src/test/resources/application.properties")
+  run {
+    val propertiesFile = file("src/test/resources/application.properties")
 
-        require(propertiesFile.exists()) {
-            """
-              Missing application.properties. Please read README.md and follow the setup instructions to create:
-              `src/test/resources/application.properties` with correct content
-              """.trimIndent()
-        }
-
-        Properties().apply {
-            propertiesFile.inputStream().use(::load)
-        }
+    require(propertiesFile.exists()) {
+      """
+      Missing application.properties. Please read README.md and follow the setup instructions to create:
+      `src/test/resources/application.properties` with correct content
+      """.trimIndent()
     }
+
+    Properties().apply {
+      propertiesFile.inputStream().use(::load)
+    }
+  }
 
 val databaseSettings =
   mapOf(
@@ -51,8 +51,8 @@ repositories {
 
 dependencies {
   implementation(kotlin("stdlib"))
-  implementation ("org.slf4j:slf4j-api:2.0.17")
-  implementation ("ch.qos.logback:logback-classic:1.5.23")
+  implementation("org.slf4j:slf4j-api:2.0.17")
+  implementation("ch.qos.logback:logback-classic:1.5.23")
   jooqGenerator("org.postgresql:postgresql:42.7.8")
   implementation("org.flywaydb:flyway-database-postgresql:11.20.0")
   implementation("org.jooq:jooq:3.20.10")
@@ -62,6 +62,12 @@ dependencies {
   testImplementation(platform("org.junit:junit-bom:5.14.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+ktlint {
+  filter {
+    exclude("**/generated/**")
+  }
 }
 
 tasks.test {
@@ -118,9 +124,14 @@ val generateJooq by tasks.existing
 
 tasks.named("generateJooq") {
   dependsOn("flywayMigrate")
-  doFirst {
-    project.delete(layout.projectDirectory.dir("src/main/generated/jooq"))
-  }
+}
+
+tasks.named("runKtlintCheckOverMainSourceSet") {
+  dependsOn("generateJooq")
+}
+
+tasks.named("runKtlintCheckOverTestSourceSet") {
+  dependsOn("generateJooq")
 }
 
 tasks.named("flywayMigrate") {
@@ -133,10 +144,10 @@ tasks.named<KotlinCompile>("compileTestKotlin") {
 }
 
 sourceSets["main"].kotlin.srcDir(
-  layout.projectDirectory.dir("src/main/generated/jooq")
+  layout.projectDirectory.dir("src/main/generated/jooq"),
 )
 sourceSets["test"].kotlin.srcDir(
-  layout.projectDirectory.dir("src/main/generated/jooq")
+  layout.projectDirectory.dir("src/main/generated/jooq"),
 )
 
 tasks.register("ciPipeline") {
@@ -146,10 +157,10 @@ tasks.register("ciPipeline") {
     "assemble",
     "flywayMigrate",
     "generateJooq",
+    "ktlintCheck",
     "test",
   )
 }
 
 tasks.named("clean") {
-  delete(layout.projectDirectory.dir("src/main/generated/jooq"))
 }

@@ -1,3 +1,5 @@
 package org.example
 
-data class SubordinateName(val name: String)
+data class SubordinateName(
+  val name: String,
+)

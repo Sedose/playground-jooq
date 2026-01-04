@@ -6,6 +6,7 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 
+@Suppress("ClassName")
 class V7__CreateEmployeesSchema : BaseJavaMigration() {
   override fun migrate(context: Context) {
     val dsl = DSL.using(context.connection, SQLDialect.POSTGRES)
@@ -13,45 +14,47 @@ class V7__CreateEmployeesSchema : BaseJavaMigration() {
     val manager = DSL.name("manager")
     val employee = DSL.name("employee")
 
-    dsl.createTableIfNotExists(manager)
-        .column(DSL.name("manager_id"), SQLDataType.INTEGER.nullable(false))
-        .column(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false))
-        .column(DSL.name("salary"), SQLDataType.INTEGER.nullable(false))
-        .constraints(DSL.constraint("pk_manager").primaryKey(DSL.name("manager_id")))
-        .execute()
+    dsl
+      .createTableIfNotExists(manager)
+      .column(DSL.name("manager_id"), SQLDataType.INTEGER.nullable(false))
+      .column(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false))
+      .column(DSL.name("salary"), SQLDataType.INTEGER.nullable(false))
+      .constraints(DSL.constraint("pk_manager").primaryKey(DSL.name("manager_id")))
+      .execute()
 
-    dsl.createTableIfNotExists(employee)
-        .column(DSL.name("employee_id"), SQLDataType.INTEGER.nullable(false))
-        .column(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false))
-        .column(DSL.name("salary"), SQLDataType.INTEGER.nullable(false))
-        .column(DSL.name("manager_id"), SQLDataType.INTEGER)
-        .constraints(
-            DSL.constraint("pk_employee").primaryKey(DSL.name("employee_id")),
-            DSL.constraint("fk_employee_manager_id")
-                .foreignKey(DSL.name("manager_id"))
-                .references(manager, DSL.name("manager_id")),
-        )
-        .execute()
+    dsl
+      .createTableIfNotExists(employee)
+      .column(DSL.name("employee_id"), SQLDataType.INTEGER.nullable(false))
+      .column(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false))
+      .column(DSL.name("salary"), SQLDataType.INTEGER.nullable(false))
+      .column(DSL.name("manager_id"), SQLDataType.INTEGER)
+      .constraints(
+        DSL.constraint("pk_employee").primaryKey(DSL.name("employee_id")),
+        DSL
+          .constraint("fk_employee_manager_id")
+          .foreignKey(DSL.name("manager_id"))
+          .references(manager, DSL.name("manager_id")),
+      ).execute()
 
-    dsl.insertInto(DSL.table(manager))
-        .columns(
-            DSL.field(DSL.name("manager_id")),
-            DSL.field(DSL.name("name")),
-            DSL.field(DSL.name("salary")),
-        )
-        .values(1, "Sam", 60000)
-        .values(2, "Max", 90000)
-        .execute()
+    dsl
+      .insertInto(DSL.table(manager))
+      .columns(
+        DSL.field(DSL.name("manager_id")),
+        DSL.field(DSL.name("name")),
+        DSL.field(DSL.name("salary")),
+      ).values(1, "Sam", 60000)
+      .values(2, "Max", 90000)
+      .execute()
 
-    dsl.insertInto(DSL.table(employee))
-        .columns(
-            DSL.field(DSL.name("employee_id")),
-            DSL.field(DSL.name("name")),
-            DSL.field(DSL.name("salary")),
-            DSL.field(DSL.name("manager_id")),
-        )
-        .values(1, "Joe", 70000, 1)
-        .values(2, "Henry", 80000, 2)
-        .execute()
+    dsl
+      .insertInto(DSL.table(employee))
+      .columns(
+        DSL.field(DSL.name("employee_id")),
+        DSL.field(DSL.name("name")),
+        DSL.field(DSL.name("salary")),
+        DSL.field(DSL.name("manager_id")),
+      ).values(1, "Joe", 70000, 1)
+      .values(2, "Henry", 80000, 2)
+      .execute()
   }
 }

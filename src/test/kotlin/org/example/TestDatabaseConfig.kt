@@ -1,8 +1,5 @@
 package org.example
 
-import java.io.IOException
-import java.sql.DriverManager
-import java.util.Properties
 import org.jooq.DSLContext
 import org.jooq.ExecuteContext
 import org.jooq.ExecuteListener
@@ -11,6 +8,9 @@ import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.impl.DefaultExecuteListenerProvider
+import java.io.IOException
+import java.sql.DriverManager
+import java.util.Properties
 
 object TestDatabaseConfig {
   fun withDslContext(testLogic: (DSLContext) -> Unit) {
@@ -29,8 +29,8 @@ object TestDatabaseConfig {
 
   fun load(): DatabaseConnectionSettings {
     val input =
-        TestDatabaseConfig::class.java.classLoader.getResourceAsStream("application.properties")
-            ?: throw RuntimeException("Unable to find application.properties")
+      TestDatabaseConfig::class.java.classLoader.getResourceAsStream("application.properties")
+        ?: throw RuntimeException("Unable to find application.properties")
 
     val properties = Properties()
     try {
@@ -45,7 +45,11 @@ object TestDatabaseConfig {
     return DatabaseConnectionSettings(url, username, password)
   }
 
-  data class DatabaseConnectionSettings(val url: String, val username: String, val password: String)
+  data class DatabaseConnectionSettings(
+    val url: String,
+    val username: String,
+    val password: String,
+  )
 
   private class SqlPrintListener : ExecuteListener {
     override fun renderEnd(ctx: ExecuteContext) {
