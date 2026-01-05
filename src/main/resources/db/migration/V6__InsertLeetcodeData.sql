@@ -1,0 +1,43 @@
+INSERT
+    INTO
+        person(
+            person_id,
+            last_name,
+            first_name
+        )
+    VALUES(
+        1,
+        'Wang',
+        'Allen'
+    ),
+    (
+        2,
+        'Alice',
+        'Bob'
+    ),
+    (
+        3,
+        'Without',
+        'Orders'
+    );
+
+INSERT
+    INTO
+        address(
+            address_id,
+            person_id,
+            city,
+            state
+        )
+    VALUES(
+        1,
+        1,
+        'New York City',
+        'New York'
+    ),
+    (
+        2,
+        2,
+        'Leetcode',
+        'California'
+    );
