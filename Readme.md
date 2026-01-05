@@ -25,7 +25,7 @@ jdbc.password=<here comes real password>
 ```
 
 ## What you get
-- Flyway migrations in `src/main/java/db/migration`
+- Flyway migrations in `src/main/resources/db/migration`
 - Generated JOOQ sources in `build/generated-src/jooq`
 - JUnit 5 tests in `src/test/java`
 - App config in `src/test/resources`

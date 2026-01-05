@@ -18,6 +18,7 @@ plugins {
   id("org.flywaydb.flyway") version "11.20.0"
   id("nu.studer.jooq") version "10.2"
   id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+  id("com.diffplug.spotless") version "8.1.0"
 }
 
 private val loadedDatabaseProperties =
@@ -67,6 +68,13 @@ dependencies {
 ktlint {
   filter {
     exclude("**/generated/**")
+  }
+}
+
+spotless {
+  sql {
+    target("src/main/resources/db/migration/**/*.sql")
+    dbeaver()
   }
 }
 
